@@ -1,0 +1,31 @@
+{
+  "connection": "default",
+  "collectionName": "yomusers",
+  "info": {
+    "name": "yomuser",
+    "description": ""
+  },
+  "options": {
+    "increments": true,
+    "timestamps": true,
+    "comment": ""
+  },
+  "attributes": {
+    "user_name": {
+      "default": "",
+      "type": "string"
+    },
+    "password": {
+      "default": "",
+      "type": "string"
+    },
+    "is_active": {
+      "default": "",
+      "type": "integer"
+    },
+    "is_admin": {
+      "default": "",
+      "type": "integer"
+    }
+  }
+}

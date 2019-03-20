@@ -1,0 +1,47 @@
+{
+  "connection": "default",
+  "collectionName": "projects",
+  "info": {
+    "name": "project",
+    "description": ""
+  },
+  "options": {
+    "increments": true,
+    "timestamps": true,
+    "comment": ""
+  },
+  "attributes": {
+    "proj_name": {
+      "default": "",
+      "type": "string"
+    },
+    "comp_name": {
+      "default": "",
+      "type": "string"
+    },
+    "description": {
+      "default": "",
+      "type": "string"
+    },
+    "proj_type_id": {
+      "default": "",
+      "type": "integer"
+    },
+    "create_time": {
+      "default": "",
+      "type": "date"
+    },
+    "update_time": {
+      "default": "",
+      "type": "date"
+    },
+    "user_id": {
+      "default": "",
+      "type": "integer"
+    },
+    "is_active": {
+      "default": "",
+      "type": "integer"
+    }
+  }
+}

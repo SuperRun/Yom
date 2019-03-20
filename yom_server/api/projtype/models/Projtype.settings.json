@@ -1,0 +1,27 @@
+{
+  "connection": "default",
+  "collectionName": "projtypes",
+  "info": {
+    "name": "projtype",
+    "description": ""
+  },
+  "options": {
+    "increments": true,
+    "timestamps": true,
+    "comment": ""
+  },
+  "attributes": {
+    "is_active": {
+      "default": "",
+      "type": "integer"
+    },
+    "type_name": {
+      "default": "",
+      "type": "string"
+    },
+    "update_time": {
+      "default": "",
+      "type": "date"
+    }
+  }
+}

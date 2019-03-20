@@ -1,0 +1,27 @@
+{
+  "connection": "default",
+  "collectionName": "categories",
+  "info": {
+    "name": "category",
+    "description": ""
+  },
+  "options": {
+    "increments": true,
+    "timestamps": true,
+    "comment": ""
+  },
+  "attributes": {
+    "cat_name": {
+      "default": "",
+      "type": "string"
+    },
+    "parent_id": {
+      "default": "",
+      "type": "integer"
+    },
+    "is_active": {
+      "default": "",
+      "type": "integer"
+    }
+  }
+}

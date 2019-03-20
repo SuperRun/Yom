@@ -1,0 +1,35 @@
+{
+  "connection": "default",
+  "collectionName": "projectcheckedcats",
+  "info": {
+    "name": "projhistorycat",
+    "description": ""
+  },
+  "options": {
+    "increments": true,
+    "timestamps": true,
+    "comment": ""
+  },
+  "attributes": {
+    "cat_id": {
+      "default": "",
+      "type": "integer"
+    },
+    "proj_id": {
+      "default": "",
+      "type": "integer"
+    },
+    "cat_name": {
+      "default": "",
+      "type": "string"
+    },
+    "is_checked": {
+      "default": "",
+      "type": "integer"
+    },
+    "parent_id": {
+      "default": "",
+      "type": "integer"
+    }
+  }
+}

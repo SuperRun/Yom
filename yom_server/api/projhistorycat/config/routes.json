@@ -1,0 +1,52 @@
+{
+  "routes": [
+    {
+      "method": "GET",
+      "path": "/projhistorycats",
+      "handler": "Projhistorycat.find",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/projhistorycats/count",
+      "handler": "Projhistorycat.count",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/projhistorycats/:id",
+      "handler": "Projhistorycat.findOne",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/projhistorycats",
+      "handler": "Projhistorycat.create",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "PUT",
+      "path": "/projhistorycats/:id",
+      "handler": "Projhistorycat.update",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/projhistorycats/:id",
+      "handler": "Projhistorycat.destroy",
+      "config": {
+        "policies": []
+      }
+    }
+  ]
+}
