@@ -1,94 +1,70 @@
-import nodeExternals from "webpack-node-externals";
-import VuetifyLoaderPlugin from "vuetify-loader/lib/plugin";
-require("dotenv").config();
+import VuetifyLoaderPlugin from 'vuetify-loader/lib/plugin'
+import pkg from './package'
 
 export default {
-  // https://nuxtjs.org/api/configuration-modern
-  modern: true,
+  mode: 'universal',
 
-  // https://nuxtjs.org/api/configuration-head
+  /*
+  ** Headers of the page
+  */
   head: {
-    titleTemplate: title =>
-      title ? `${title} - Nuxt PWA Vuetify` : "Nuxt PWA Vuetify",
+    title: pkg.name,
     meta: [
-      { charset: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { hid: "description", name: "description", content: "" }
+      { charset: 'utf-8' },
+      { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+      { hid: 'description', name: 'description', content: pkg.description }
+    ],
+    link: [
+      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
+      {
+        rel: 'stylesheet',
+        href:
+          'https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons'
+      }
     ]
   },
 
-  // https://nuxtjs.org/api/configuration-modules
-  modules: [
-    // https://axios.nuxtjs.org/
-    "@nuxtjs/axios",
+  /*
+  ** Customize the progress-bar color
+  */
+  loading: { color: '#fff' },
 
-    // https://nuxtjs.org/faq/cached-components/
-    "@nuxtjs/component-cache",
-
-    // https://github.com/nuxt-community/dotenv-module
-    "@nuxtjs/dotenv",
-
-    // https://pwa.nuxtjs.org/
-    "@nuxtjs/pwa",
-
-    // https://github.com/nuxt-community/sitemap-module
-    "@nuxtjs/sitemap",
-
-    // https://github.com/nuxt-community/sentry-module
-    // "@nuxtjs/sentry",
-
-    // https://github.com/Developmint/nuxt-webfontloader
-    "nuxt-webfontloader"
-
-    // https://github.com/nuxt-community/analytics-module
-    // [
-    //   "@nuxtjs/google-analytics",
-    //   {
-    //     // TODO: Change this id to your Google Analytics ID
-    //     id: process.env.GOOGLE_ANALYTICS
-    //   }
-    // ]
+  /*
+  ** Global CSS
+  */
+  css: [
+    '~/assets/style/app.styl'
   ],
 
-  webfontloader: {
-    google: {
-      families: ["Roboto:100,300,400,500,700,900", "Material+Icons"]
-    }
-  },
+  /*
+  ** Plugins to load before mounting the App
+  */
+  plugins: [
+    '@/plugins/vuetify'
+  ],
 
-  // https://nuxtjs.org/api/configuration-plugins
-  plugins: ["~/plugins/vuetify", "~/plugins/vee-validate"],
+  /*
+  ** Nuxt.js modules
+  */
+  modules: [
+      '@nuxtjs/pwa'
+  ],
 
-  // https://nuxtjs.org/api/configuration-css
-  css: ["~/assets/styles/vuetify.styl"],
-
-  // https://nuxtjs.org/api/configuration-watch
-  watch: ["~/vuex/**/*.js"],
-
-  // https://nuxtjs.org/api/configuration-build
+  /*
+  ** Build configuration
+  */
   build: {
-    extractCSS: true,
-    transpile: [/^vuetify/],
+    transpile: ['vuetify/lib'],
     plugins: [new VuetifyLoaderPlugin()],
-    extend(config, { isDev, isClient }) {
-      if (isDev && isClient) {
-        config.module.rules.push({
-          enforce: "pre",
-          test: /\.(js|vue)$/,
-          loader: "eslint-loader",
-          exclude: /node_modules/,
-          options: {
-            fix: true
-          }
-        });
+    loaders: {
+      stylus: {
+        import: ['~assets/style/variables.styl']
       }
-      if (process.server) {
-        config.externals = [
-          nodeExternals({
-            whitelist: [/^vuetify/]
-          })
-        ];
-      }
+    },
+    /*
+    ** You can extend webpack config here
+    */
+    extend(config, ctx) {
     }
   }
-};
+}

@@ -1,13 +1,5 @@
-# Cypress screenshots and videos
-test/e2e/screenshots
-test/e2e/videos
-
-# Nuxt Plugin
-static/sw.js
-static/browserconfig.xml
-static/OneSignalSDKUpdaterWorker.js
-static/OneSignalSDKWorker.js
-
+# Created by .ignore support plugin (hsz.mobi)
+### Node template
 # Logs
 logs
 *.log
@@ -30,7 +22,7 @@ coverage
 # nyc test coverage
 .nyc_output
 
-# Grunt intermediate storage (https://gruntjs.com/creating-plugins#storing-task-files)
+# Grunt intermediate storage (http://gruntjs.com/creating-plugins#storing-task-files)
 .grunt
 
 # Bower dependency directory (https://bower.io/)
@@ -76,11 +68,17 @@ typings/
 # nuxt.js build output
 .nuxt
 
+# Nuxt generate
+dist
+
 # vuepress build output
 .vuepress/dist
 
 # Serverless directories
 .serverless
 
-# FuseBox cache
-.fusebox/
+# IDE
+.idea
+
+# Service worker
+sw.*

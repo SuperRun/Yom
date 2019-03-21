@@ -1,36 +1,15 @@
-import LRUCache from "lru-cache";
-import Vue from "vue";
-import Vuetify, {
-  VApp,
-  VNavigationDrawer,
-  VFooter,
-  VToolbar,
-  VTextField
-} from "vuetify/lib";
-import { Ripple } from "vuetify/lib/directives";
-
-import "@mdi/font/css/materialdesignicons.css";
+import Vue from 'vue'
+import Vuetify from 'vuetify/lib'
+import colors from 'vuetify/es5/util/colors'
 
 Vue.use(Vuetify, {
-  options: {
-    minifyTheme: css =>
-      process.env.NODE_ENV === "production"
-        ? css.replace(/[\s|\r\n|\r|\n]/g, "")
-        : css,
-    themeCache: new LRUCache({
-      max: 10,
-      maxAge: 1000 * 60 * 60 // 1 hour
-    }),
-    cspNonce: "dQw4w9WgXcQ"
-  },
-  directives: {
-    Ripple
-  },
-  components: {
-    VApp,
-    VNavigationDrawer,
-    VFooter,
-    VToolbar,
-    VTextField
+  theme: {
+    primary: colors.blue.darken2,
+    accent: colors.grey.darken3,
+    secondary: colors.amber.darken3,
+    info: colors.teal.lighten1,
+    warning: colors.amber.base,
+    error: colors.deepOrange.accent4,
+    success: colors.green.accent3
   }
-});
+})
