@@ -13,9 +13,7 @@
 
             </v-flex>
         </v-layout>
-        <v-container>
-            <Nuxt/>
-        </v-container>
+        <Nuxt/>
     </v-app>
 </template>
 
