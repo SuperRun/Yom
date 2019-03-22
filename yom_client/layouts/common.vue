@@ -1,0 +1,30 @@
+<template>
+    <v-app>
+        <v-layout row align-center font-weight-medium class="themeColor">
+            <v-flex xs2>
+                <v-btn icon>
+                    <v-icon color="#ffffff">keyboard_backspace</v-icon>
+                </v-btn>
+            </v-flex>
+            <v-flex xs8 text-xs-center title class="white--text">
+                Title
+            </v-flex>
+            <v-flex xs2>
+
+            </v-flex>
+        </v-layout>
+        <v-container>
+            <Nuxt/>
+        </v-container>
+    </v-app>
+</template>
+
+<script>
+    export default {
+        name: "common"
+    }
+</script>
+
+<style scoped>
+
+</style>
