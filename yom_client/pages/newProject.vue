@@ -57,7 +57,7 @@
                             justify-center
                             mt-5
                   >
-                    <v-btn  bottom="true"class="themeColor white--text btn mx-auto">Preview</v-btn>
+                    <v-btn  class="themeColor white--text btn mx-auto">Preview</v-btn>
                   </v-layout>
 
                 </v-card>
@@ -73,7 +73,6 @@
 
 <script>
   export default {
-    el: '#app',
     data () {
       return {
         radios: 'Category1',
