@@ -11,7 +11,7 @@
     "comment": ""
   },
   "attributes": {
-    "user_name": {
+    "usename": {
       "default": "",
       "type": "string"
     },
@@ -19,13 +19,17 @@
       "default": "",
       "type": "string"
     },
-    "is_active": {
+    "isActive": {
+      "default": 1,
+      "type": "integer"
+    },
+    "isAdmin": {
       "default": "",
       "type": "integer"
     },
-    "is_admin": {
-      "default": "",
-      "type": "integer"
+    "projects": {
+      "collection": "project",
+      "via": "user"
     }
   }
 }

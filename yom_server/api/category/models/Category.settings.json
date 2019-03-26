@@ -11,17 +11,20 @@
     "comment": ""
   },
   "attributes": {
-    "cat_name": {
+    "catName": {
       "default": "",
       "type": "string"
     },
-    "parent_id": {
-      "default": "",
+    "catconfig": {
+      "model": "catconfig",
+      "via": "category"
+    },
+    "isActive": {
+      "default": 1,
       "type": "integer"
     },
-    "is_active": {
-      "default": "",
-      "type": "integer"
+    "parentId": {
+      "model": "category"
     }
   }
 }

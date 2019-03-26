@@ -11,17 +11,17 @@
     "comment": ""
   },
   "attributes": {
-    "cat_id": {
-      "default": "",
+    "isActive": {
+      "default": 1,
       "type": "integer"
     },
-    "proj_type_id": {
-      "default": "",
-      "type": "integer"
+    "category": {
+      "model": "category",
+      "via": "catconfig"
     },
-    "is_active": {
-      "default": "",
-      "type": "integer"
+    "projtype": {
+      "model": "projtype",
+      "via": "catconfigs"
     }
   }
 }

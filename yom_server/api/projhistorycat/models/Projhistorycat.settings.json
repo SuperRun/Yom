@@ -1,6 +1,6 @@
 {
   "connection": "default",
-  "collectionName": "projectcheckedcats",
+  "collectionName": "projhistorycats",
   "info": {
     "name": "projhistorycat",
     "description": ""
@@ -11,25 +11,25 @@
     "comment": ""
   },
   "attributes": {
-    "cat_id": {
+    "catId": {
       "default": "",
       "type": "integer"
     },
-    "proj_id": {
-      "default": "",
-      "type": "integer"
-    },
-    "cat_name": {
+    "catName": {
       "default": "",
       "type": "string"
     },
-    "is_checked": {
+    "isChecked": {
       "default": "",
       "type": "integer"
     },
-    "parent_id": {
+    "parentId": {
       "default": "",
       "type": "integer"
+    },
+    "project": {
+      "model": "project",
+      "via": "projhistorycats"
     }
   }
 }

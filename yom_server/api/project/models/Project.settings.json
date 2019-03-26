@@ -11,11 +11,11 @@
     "comment": ""
   },
   "attributes": {
-    "proj_name": {
+    "projName": {
       "default": "",
       "type": "string"
     },
-    "comp_name": {
+    "compName": {
       "default": "",
       "type": "string"
     },
@@ -23,25 +23,25 @@
       "default": "",
       "type": "string"
     },
-    "proj_type_id": {
-      "default": "",
-      "type": "integer"
-    },
-    "create_time": {
+    "createTime": {
       "default": "",
       "type": "date"
     },
-    "update_time": {
+    "updateTime": {
       "default": "",
       "type": "date"
     },
-    "user_id": {
-      "default": "",
+    "isActive": {
+      "default": 1,
       "type": "integer"
     },
-    "is_active": {
-      "default": "",
-      "type": "integer"
+    "user": {
+      "model": "yomuser",
+      "via": "projects"
+    },
+    "projhistorycats": {
+      "collection": "projhistorycat",
+      "via": "project"
     }
   }
 }

@@ -11,17 +11,21 @@
     "comment": ""
   },
   "attributes": {
-    "is_active": {
-      "default": "",
+    "isActive": {
+      "default": 1,
       "type": "integer"
     },
-    "type_name": {
+    "typeName": {
       "default": "",
       "type": "string"
     },
-    "update_time": {
+    "updateTime": {
       "default": "",
       "type": "date"
+    },
+    "catconfigs": {
+      "collection": "catconfig",
+      "via": "projtype"
     }
   }
 }

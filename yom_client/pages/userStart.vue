@@ -28,7 +28,7 @@
                           mt-5
                 >
                     <v-flex xs6 class="flex-width">
-                        <v-btn  class="themeColor white--text btn-width" >Create a new project</v-btn>
+                        <v-btn to="/chooseType"  class="themeColor white--text btn-width" >Create a new project</v-btn>
                     </v-flex>
                     <v-flex xs6 class="flex-width" mt-4>
                         <v-btn  class="themeColor white--text btn-width">Show my project</v-btn>

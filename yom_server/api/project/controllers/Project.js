@@ -49,6 +49,7 @@ module.exports = {
    */
 
   create: async (ctx) => {
+    console.log(ctx.request.body);
     return strapi.services.project.add(ctx.request.body);
   },
 

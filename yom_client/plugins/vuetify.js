@@ -14,5 +14,4 @@ Vue.use(Vuetify, {
     themeColor: '#D4A079',
     lighter: '#F5EEE6'
   }
-
 })

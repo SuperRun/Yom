@@ -7,7 +7,7 @@
                 </v-btn>
             </v-flex>
             <v-flex xs8 text-xs-center title class="white--text">
-                Title
+                {{title}}
             </v-flex>
             <v-flex xs2>
 
@@ -19,7 +19,21 @@
 
 <script>
     export default {
-        name: "common"
+        name: "common",
+        data(){
+            return {
+                titleMap: new Map([
+                        ["chooseType","Choose Type"],
+                        ["detail","Detail"]
+                    ]
+                )
+            }
+        },
+        computed:{
+            title: function () {
+                return this.titleMap.get(this.$route.name);
+            }
+        }
     }
 </script>
 

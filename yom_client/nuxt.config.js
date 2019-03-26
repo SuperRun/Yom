@@ -41,6 +41,7 @@ export default {
   */
   plugins: [
     '@/plugins/vuetify'
+
   ],
 
   /*
@@ -66,5 +67,11 @@ export default {
     */
     extend(config, ctx) {
     }
-  }
+  },
+  /*
+  ** Baseurl configuration
+  */
+  // env: {
+  //     baseUrl: process.env.BASE_URL || 'http://localhost:1337'
+  // }
 }
