@@ -93,7 +93,7 @@
         },
         computed:{
             type: function () {
-                return this.$route.query.type;
+                return this.$route.query.type || '';
             },
             ...mapGetters([
                 'projNameShare',
@@ -108,6 +108,9 @@
         async created () {
 
             const vm = this;
+            if (!vm.type) {
+                vm.$router.replace({path:'/chooseType'});
+            }
 
             if (vm.projNameShare) {
                 vm.projName = vm.projNameShare;
