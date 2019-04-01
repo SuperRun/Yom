@@ -1,12 +1,18 @@
 <template>
     <v-app>
-        <v-layout row align-center font-weight-medium class="themeColor">
+        <v-layout row
+                  align-center
+                  font-weight-medium
+                  class="themeColor">
             <v-flex xs2>
                 <v-btn icon>
                     <v-icon color="#ffffff">keyboard_backspace</v-icon>
                 </v-btn>
             </v-flex>
-            <v-flex xs8 text-xs-center title class="white--text">
+            <v-flex xs8
+                    text-xs-center
+                    title
+                    class="white--text">
                 {{title}}
             </v-flex>
             <v-flex xs2>
@@ -20,11 +26,12 @@
 <script>
     export default {
         name: "common",
-        data(){
+        data() {
             return {
                 titleMap: new Map([
-                        ["chooseType","Choose Type"],
-                        ["detail","Detail"]
+                        ["chooseType", "Choose Type"],
+                        ["detail", "Detail"],
+                        ["preview", "Preview"]
                     ]
                 )
             }
