@@ -1,32 +1,7 @@
-import Vuex from 'vuex'
+import newProj from './modules/newProj';
 
-const cookieparser = process.server ? require('cookieparser') : undefined
+export const namespaced = true;
 
-const createStore = () => {
-  return new Vuex.Store({
-    state: {
-      auth: null
-    },
-    mutations: {
-      setAuth(state, auth) {
-        state.auth = auth
-      }
-    },
-    actions: {
-      nuxtServerInit({ commit }, { req }) {
-        let auth = null
-        if (req.headers.cookie) {
-          const parsed = cookieparser.parse(req.headers.cookie)
-          try {
-            auth = JSON.parse(parsed.auth)
-          } catch (err) {
-            // No valid cookie found
-          }
-        }
-        commit('setAuth', auth)
-      }
-    }
-  })
+export const modules = {
+    newProj
 }
-
-export default createStore

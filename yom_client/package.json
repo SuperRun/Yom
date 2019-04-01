@@ -13,7 +13,9 @@
   "dependencies": {
     "@nuxtjs/pwa": "^3.0.0-beta.14",
     "axios": "^0.18.0",
+    "cookieparser": "^0.1.0",
     "cross-env": "^5.2.0",
+    "js-cookie": "^2.2.0",
     "nuxt": "^2.4.0",
     "vuetify": "^1.5.5",
     "vuetify-loader": "^1.2.1"
