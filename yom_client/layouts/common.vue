@@ -31,8 +31,7 @@
                 titleMap: new Map([
                         ["chooseType", "Choose Type"],
                         ["detail", "Detail"],
-                        ["preview", "Preview"],
-                        ["project", "My Project"]
+                        ["preview", "Preview"]
                     ]
                 )
             }
