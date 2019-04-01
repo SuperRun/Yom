@@ -53,6 +53,16 @@ module.exports = {
   },
 
   /**
+   * Create projhistorycat records.
+   *
+   * @return {Object}
+   */
+
+  createBulk: async (ctx) => {
+    return strapi.services.projhistorycat.addBulk(ctx.request.body);
+  },
+
+  /**
    * Update a/an projhistorycat record.
    *
    * @return {Object}

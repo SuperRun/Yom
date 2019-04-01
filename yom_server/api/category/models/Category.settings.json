@@ -25,6 +25,10 @@
     },
     "parentId": {
       "model": "category"
+    },
+    "timeCost": {
+      "default": "",
+      "type": "integer"
     }
   }
 }

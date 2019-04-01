@@ -13,6 +13,11 @@ const _ = require('lodash');
 // Strapi utilities.
 const utils = require('strapi-hook-bookshelf/lib/utils/');
 
+// request code
+const SUCCESS_CODE = 1;
+
+const FAIL_CODE = 0;
+
 module.exports = {
 
   /**
@@ -33,7 +38,7 @@ module.exports = {
       _.forEach(filters.where, (where, key) => {
         if (_.isArray(where.value) && where.symbol !== 'IN' && where.symbol !== 'NOT IN') {
           for (const value in where.value) {
-            qb[value ? 'where' : 'orWhere'](key, where.symbol, where.value[value])
+            qb[value ? 'where' : 'orWhere'](key, where.symbol, where.value[value]);
           }
         } else {
           qb.where(key, where.symbol, where.value);
@@ -110,6 +115,32 @@ module.exports = {
   },
 
   /**
+  * Promise to add projhistorycats
+  * (problem is if 3 records insert ok, 2 left unseccessful,how to deal that)
+  * @return {Promise}
+  */
+  addBulk:  async (values) => {
+    let obj = {
+      'code': SUCCESS_CODE,
+      'msg': 'create successfully'
+    };
+    let saveArr = [];
+    for (let index=0;index < values.length; index++) {
+      try {
+        await module.exports.add(values[index]).then((val)=>{
+          saveArr.push(val);
+        });
+      } catch (e) {
+        obj.code = FAIL_CODE;
+        obj.msg = 'create unsuccessfully';
+        await module.exports.removeBulk(saveArr);
+        return obj;
+      }
+    }
+    return obj;
+  },
+
+  /**
    * Promise to edit a/an projhistorycat.
    *
    * @return {Promise}
@@ -155,6 +186,17 @@ module.exports = {
     await Projhistorycat.updateRelations(params);
 
     return Projhistorycat.forge(params).destroy();
+  },
+  /**
+   * Promise to remove projhistorycats.
+   *
+   *
+   */
+  removeBulk: async (values) => {
+    for (let val of values) {
+      await module.exports.remove(val);
+    }
+    return;
   },
 
   /**

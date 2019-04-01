@@ -42,6 +42,10 @@
     "projhistorycats": {
       "collection": "projhistorycat",
       "via": "project"
+    },
+    "timeTotal": {
+      "default": "",
+      "type": "integer"
     }
   }
 }

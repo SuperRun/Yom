@@ -26,8 +26,16 @@
     },
     {
       "method": "POST",
-      "path": "/projhistorycats",
+      "path": "/projhistorycat",
       "handler": "Projhistorycat.create",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/projhistorycats",
+      "handler": "Projhistorycat.createBulk",
       "config": {
         "policies": []
       }

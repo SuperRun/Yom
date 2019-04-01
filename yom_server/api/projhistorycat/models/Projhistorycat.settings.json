@@ -30,6 +30,10 @@
     "project": {
       "model": "project",
       "via": "projhistorycats"
+    },
+    "timeCost": {
+      "default": "",
+      "type": "integer"
     }
   }
 }
