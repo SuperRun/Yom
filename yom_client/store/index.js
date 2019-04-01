@@ -1,7 +1,7 @@
 import newProj from './modules/newProj';
 
-export const namespaced = true;
+export  const namespaced = true;
 
-export const modules = {
+export const modules ={
     newProj
 }

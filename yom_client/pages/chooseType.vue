@@ -25,7 +25,6 @@
     export default {
         name: "chooseType",
         layout: 'common',
-      middleware: 'authenticated',
         data () {
             return {
                 bgColor: [
@@ -35,6 +34,11 @@
                     'light-green'
                 ]
             }
+        },
+        created () {
+            console.log(this.title);
+            this.title = "Choose Type";
+            console.log(this.title);
         },
         async asyncData ({ params }) {
             return await axios.get("http://localhost:1337/projtypes?isActive=1")
