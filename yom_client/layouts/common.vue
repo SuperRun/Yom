@@ -5,7 +5,7 @@
                   font-weight-medium
                   class="themeColor">
             <v-flex xs2>
-                <v-btn icon>
+                <v-btn icon @click="goBack">
                     <v-icon color="#ffffff">keyboard_backspace</v-icon>
                 </v-btn>
             </v-flex>
@@ -31,7 +31,8 @@
                 titleMap: new Map([
                         ["chooseType", "Choose Type"],
                         ["detail", "Detail"],
-                        ["preview", "Preview"]
+                        ["preview", "Preview"],
+                        ["project", "My Project"]
                     ]
                 )
             }
@@ -39,6 +40,11 @@
         computed:{
             title: function () {
                 return this.titleMap.get(this.$route.name);
+            }
+        },
+        methods: {
+            goBack(){
+                this.$router.go(-1);
             }
         }
     }

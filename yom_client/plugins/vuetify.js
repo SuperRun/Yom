@@ -12,6 +12,10 @@ Vue.use(Vuetify, {
     error: colors.deepOrange.accent4,
     success: colors.green.accent3,
     themeColor: '#D4A079',
-    lighter: '#F5EEE6'
+    lighter: '#F5EEE6',
+    timelineColor1: '#d09796',
+    timelineColor2: '#91dccb',
+    timelineColor3: '#d9b780',
+
   }
 })
