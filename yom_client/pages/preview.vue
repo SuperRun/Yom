@@ -151,17 +151,20 @@
                 console.log(projhistorycats)
                 await axios.post('http://localhost:1337/projhistorycats', projhistorycats)
                     .then((res) => {
-                        setTimeout(() => (vm.savingDialog = false), 1000);
+                        setTimeout(() => {
+                            vm.savingDialog = false;
+                            vm.$router.replace('/project');
+                        }, 1000);
                     });
             },
             async saveProject() {
-                const {projName, description} = this;
+                const {projNameShare, descriptionShare} = this;
                 const vm = this;
                 vm.tipDialog = false;
                 vm.savingDialog = true;
                 await axios.post('http://localhost:1337/projects', {
-                    projName,
-                    description,
+                    projName: projNameShare,
+                    description: descriptionShare,
                     user: 1 // it will be changed if login function is available
                 }).then((res) => {
                         const project = res.data.id;
