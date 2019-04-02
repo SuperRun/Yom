@@ -12,8 +12,8 @@
                         Y.O.M
                     </v-flex>
                     <v-flex xs2>
-                        <v-btn icon>
-                            <v-icon right color="#ffffff">settings</v-icon>
+                        <v-btn icon @click="logout">
+                            <v-icon right color="#ffffff">power_settings_new</v-icon>
                         </v-btn>
                     </v-flex>
                 </v-layout>
@@ -31,7 +31,7 @@
                         <v-btn to="/chooseType"  class="themeColor white--text btn-width" >Create a new project</v-btn>
                     </v-flex>
                     <v-flex xs6 class="flex-width" mt-4>
-                        <v-btn to="/project" class="themeColor white--text btn-width">Show my projects</v-btn>
+                        <v-btn  class="themeColor white--text btn-width">Show my project</v-btn>
                     </v-flex>
                 </v-layout>
             </v-flex>
@@ -41,12 +41,25 @@
 </template>
 
 <script>
-    export default {
+  const Cookie = process.client ? require('js-cookie') : undefined
+
+  export default {
+    middleware: 'authenticated',
         data(){
             return {
                 title: "YOM"
             }
-        }
+        },
+      methods: {
+        logout() {
+          // Code will also be required to invalidate the JWT Cookie on external API
+          console.log('66666');
+          Cookie.remove('auth');
+          this.$store.commit('auth/setAuth', null);
+          this.$router.push(`/login`)
+          this.$router.go(0)
+        },
+      }
     }
 </script>
 <style>
