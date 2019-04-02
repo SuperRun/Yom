@@ -32,7 +32,8 @@
                         ["chooseType", "Choose Type"],
                         ["detail", "Detail"],
                         ["preview", "Preview"],
-                        ["project", "My Project"]
+                        ["project", "My Project"],
+                        ["search", "Search"]
                     ]
                 )
             }

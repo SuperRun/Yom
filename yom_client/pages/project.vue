@@ -25,6 +25,11 @@
                 </v-layout>
             </v-timeline-item>
         </v-timeline>
+        <div class="title
+             grey--text
+             text-lighten-1"
+             mt-5
+             v-if="!projects.length">There is no project.</div>
     </v-container>
 </template>
 
@@ -40,7 +45,10 @@
                     'timelineColor2',
                     'timelineColor3'
                 ],
-                projects: []
+                projects: [],
+                startTime: '',
+                endTime: '',
+                projName: ''
             }
         },
         computed: {
@@ -51,11 +59,17 @@
             }
         },
         async created () {
+
+            const { endTime, projName, startTime } = this.$route.query;
+
             this.projects = await axios.get('http://localhost:1337/projects',{
                 params: {
                     isActive:1,
                     user:1,
-                    _sort:'created_at:DESC'
+                    _sort:'created_at:DESC',
+                    created_at_gte: startTime,
+                    created_at_lte: endTime,
+                    projName_contains: projName
                 }
             })
             .then((res)=>{

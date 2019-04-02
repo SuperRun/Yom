@@ -4,7 +4,8 @@
             <v-flex xs12>
                 <v-layout row align-center font-weight-medium>
                     <v-flex xs2>
-                        <v-btn icon>
+                        <v-btn icon
+                               to="/search">
                             <v-icon color="#ffffff">search</v-icon>
                         </v-btn>
                     </v-flex>
