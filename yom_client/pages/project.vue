@@ -32,7 +32,8 @@
     import axios from 'axios'
     export default {
         name: "project",
-        layout: "common",
+      middleware: 'authenticated',
+      layout: "common",
         data(){
             return {
                 itemColor:[
