@@ -17,7 +17,7 @@
               <v-text-field class="mx-auto white--text"
                             background-color="rgba(255,250,250,0.5)"
                             label="USERNAME/EMAIL"
-                            box
+                            solo
                             v-model="email"
                             required
               ></v-text-field>
@@ -26,8 +26,7 @@
                 background-color="rgba(255,250,250,0.5)"
                 label="PASSWORD"
                 required
-                counter
-                box
+                solo
                 :append-icon="show1 ? 'visibility' : 'visibility_off'"
                 :type="show1 ? 'text' : 'password'"
                 @click:append="show1 = !show1"
