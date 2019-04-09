@@ -25,6 +25,7 @@
     export default {
         name: "chooseType",
         layout: 'common',
+        middleware: 'authenticated',
         data () {
             return {
                 bgColor: [
