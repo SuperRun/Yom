@@ -4,15 +4,15 @@
             fluid
             grid-list-lg
     >
-        <v-alert
-                :value="warning"
-                color="warning"
-                icon="priority_high"
-                outline
-                class="warnHeight"
-        >
-            Project name is required.
-        </v-alert>
+        <!--<v-alert-->
+                <!--:value="warning"-->
+                <!--color="warning"-->
+                <!--icon="priority_high"-->
+                <!--outline-->
+                <!--class="warnHeight"-->
+        <!--&gt;-->
+            <!--Project name is required.-->
+        <!--</v-alert>-->
 
         <v-layout row wrap>
             <v-flex xs12>
@@ -21,8 +21,6 @@
                         <v-text-field class="mx-auto"
                                       color="themeColor"
                                       label="Project name"
-                                      required
-                                      :rules="[rules.required]"
                                       v-model="projName"
                         ></v-text-field>
                         <v-text-field
@@ -41,7 +39,7 @@
                         <h2 class="themeColor--text">{{index+1}}.{{cat.category.catName}}</h2>
                         <v-checkbox v-for="(child,index) in cat.childNodes"
                                     v-model="selectedCats"
-                                    :label="`${child.category.catName}`"
+                                    :label="`${child.category.catName + ' (' + child.category.timeCost + 'h)'}`"
                                     :value="child.category.id"
                                     :key="index"
                                     class="checkboxHeight"></v-checkbox>
@@ -85,9 +83,9 @@
                 projName: "",
                 description: "",
                 selectedCats:[],
-                rules: {
-                    required: value => !!value || 'The project name is required.'
-                },
+                // rules: {
+                //     required: value => !!value || 'The project name is required.'
+                // },
                 warning: false
             }
         },
@@ -181,21 +179,24 @@
                 return catTree;
             },
             preview () {
-                this.validate();
+                // this.validate();
+                this.convertCheckedCatsToTree();
+                this.setSelectedCatsShare(this);
                 this.setProjNameShare(this);
                 this.setDescriptionShare(this);
-                this.setSelectedCatsShare(this);
+                this.$router.push('/preview');
+
             },
-            validate () {
-                const vm =this;
-                if (vm.projName) {
-                    vm.convertCheckedCatsToTree();
-                    this.$router.push('/preview');
-                } else {
-                    vm.warning=true;
-                    setTimeout(() => (vm.warning = false), 2000);
-                }
-            },
+            // validate () {
+            //     const vm =this;
+            //     if (vm.projName) {
+            //         vm.convertCheckedCatsToTree();
+            //         this.$router.push('/preview');
+            //     } else {
+            //         vm.warning=true;
+            //         setTimeout(() => (vm.warning = false), 2000);
+            //     }
+            // },
             convertCheckedCatsToTree(){
                 const vm = this;
                 let copyCatTree = vm.copyList(vm.catTree);
@@ -204,12 +205,6 @@
                 }
                 for (let i=0; i < copyCatTree.length;) {
                     for (let j=0; j< copyCatTree[i].childNodes.length; ) {
-                        console.log(`j=${j}`);
-                        vm.selectedCats.find(
-                            selectedCat => {
-                                console.log(`selectedCat=${selectedCat}`);
-                                console.log(`copyCatTree[i].childNodes[j].category.id=${copyCatTree[i].childNodes[j].category.id}`);
-                            })
                         if (!vm.selectedCats.find(selectedCat => selectedCat === copyCatTree[i].childNodes[j].category.id)) {
                             console.log('删除的id');
                             copyCatTree[i].childNodes.splice(j,1);
@@ -230,7 +225,6 @@
             copyList(arr){
                 return arr.map((e)=>{
                     if(typeof e === 'object'){
-                        console.log('it is an object');
                         return Object.assign({},e)
                     }else{
                         return e

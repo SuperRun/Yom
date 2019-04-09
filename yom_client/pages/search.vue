@@ -32,8 +32,8 @@
                                                    color="themeColor"
                                                    :max="date">
                                         <v-spacer></v-spacer>
-                                        <v-btn flat color="themeColor" @click="modal = false">Cancel</v-btn>
-                                        <v-btn flat color="themeColor" @click="$refs.dialog.save(startTime)">OK</v-btn>
+                                        <v-btn flat color="themeColor white--text" @click="modal = false">Cancel</v-btn>
+                                        <v-btn flat color="themeColor white--text" @click="$refs.dialog.save(startTime)">OK</v-btn>
                                     </v-date-picker>
                                 </v-dialog>
                             </v-flex>
@@ -60,8 +60,8 @@
                                                    :min="startTime"
                                                    :max="date">
                                         <v-spacer></v-spacer>
-                                        <v-btn flat class="themeColor"  @click="modal = false">Cancel</v-btn>
-                                        <v-btn flat class="themeColor" @click="$refs.dialog.save(endTime)">OK</v-btn>
+                                        <v-btn flat class="themeColor white--text"  @click="modal = false">Cancel</v-btn>
+                                        <v-btn flat class="themeColor white--text" @click="$refs.dialog.save(endTime)">OK</v-btn>
                                     </v-date-picker>
                                 </v-dialog>
                             </v-flex>

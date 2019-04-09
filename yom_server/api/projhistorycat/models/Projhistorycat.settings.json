@@ -34,6 +34,10 @@
     "timeCost": {
       "default": "",
       "type": "integer"
+    },
+    "description": {
+      "default": "",
+      "type": "text"
     }
   }
 }

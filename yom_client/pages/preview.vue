@@ -8,11 +8,11 @@
             <v-flex class="headline font-weight-medium"
                     align-self-center
                     mb-3>
-                {{projNameShare}}
+                {{projNameShare || 'No project name'}}
             </v-flex>
             <v-flex>
                 <div>
-                    <p><strong>Description:</strong>{{descriptionShare}}</p>
+                    <p><strong>Description:</strong>{{descriptionShare || 'No description'}}</p>
                 </div>
             </v-flex>
             <v-flex mb-3
@@ -22,7 +22,8 @@
                 <ul>
                     <li v-for="(child,index) in cat.childNodes"
                         :key="index">
-                        {{child.category.catName}}
+                        <h3>{{child.category.catName}}</h3>
+                        <p>{{child.category.description}}</p>
                     </li>
                 </ul>
             </v-flex>
@@ -39,7 +40,7 @@
             </v-flex>
             <v-flex align-self-center
                     class="flex-width">
-                <v-btn class="themeColor btn white--text mx-auto" @click="tipDialog=true">Save</v-btn>
+                <v-btn class="themeColor btn white--text mx-auto" @click="validateProjName">Save</v-btn>
             </v-flex>
         </v-layout>
 
@@ -96,13 +97,37 @@
                 </v-card-text>
             </v-card>
         </v-dialog>
+
+        <v-dialog v-model="fillDialog" persistent max-width="600px">
+            <v-card>
+                <v-card-title>
+                    <span class="headline">Add Your Project Name</span>
+                </v-card-title>
+                <v-card-text>
+                    <v-container grid-list-md>
+                        <v-layout wrap>
+                            <v-flex xs12>
+                                <v-text-field color="green darken-1"
+                                              label="Project Name"
+                                              v-model="projName"></v-text-field>
+                            </v-flex>
+                        </v-layout>
+                    </v-container>
+                </v-card-text>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn color="green darken-1" flat @click="fillDialog = false">Close</v-btn>
+                    <v-btn color="green darken-1" flat @click="saveProjName">Save</v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
     </v-container>
 </template>
 
 <script>
     import { createNamespacedHelpers } from 'vuex'
     import axios from 'axios'
-    const { mapGetters } = createNamespacedHelpers('newProj')
+    const { mapGetters, mapMutations, initData } = createNamespacedHelpers('newProj')
 
     export default {
         name: "preview",
@@ -111,6 +136,8 @@
             return {
                 tipDialog: false,
                 savingDialog: false,
+                fillDialog: false,
+                projName: ''
             }
         },
         computed: {
@@ -128,6 +155,22 @@
             console.log(this.catList);
         },
         methods:{
+            ...mapMutations ([
+                'setProjNameShare',
+                'initData'
+            ]),
+            validateProjName(){
+                const vm =this;
+                if (vm.projNameShare) {
+                    vm.saveProject()
+                } else {
+                    vm.fillDialog = true;
+                }
+            },
+            saveProjName(){
+                this.setProjNameShare(this);
+                this.fillDialog = false;
+            },
             createProjHistoryCats(project) {
                 const vm = this;
                 const projhistorycats = [];
@@ -153,6 +196,7 @@
                     .then((res) => {
                         setTimeout(() => {
                             vm.savingDialog = false;
+                            vm.initData();
                             vm.$router.replace('/project');
                         }, 1000);
                     });

@@ -26,7 +26,18 @@ const mutations = {
     setCatList: (state, catList) => (state.catList = catList),
     setTimeTotal: (state, timeTotal) => (state.timeTotal = timeTotal),
     calculateTimeTotal: (state, costTime) => (state.timeTotal += costTime),
-    setCheckedCatsTree: (state, checkedCatsTree) => (state.checkedCatsTree = checkedCatsTree)
+    setCheckedCatsTree: (state, checkedCatsTree) => (state.checkedCatsTree = checkedCatsTree),
+    initData: (state) => {
+        Object.keys(state).forEach(key=>{
+            if (typeof state[key] === 'string') state[key] = ''
+            else if (typeof state[key] === 'number') state[key] = 0
+            else if (typeof state[key] === 'boolean') state[key] = false
+            else if (typeof state[key] === 'object') {
+                if (state[key] instanceof Array) state[key] = []
+                else state[key] = {}
+            }
+        })
+    }
 }
 
 export default {

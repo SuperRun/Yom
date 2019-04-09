@@ -23,6 +23,7 @@ type Category {
   isActive: Int
   parentId: Category
   timeCost: Int
+  description: String
 }
 
 input CategoryInput {
@@ -31,6 +32,7 @@ input CategoryInput {
   isActive: Int
   parentId: ID
   timeCost: Int
+  description: String
 }
 
 input createCatconfigInput {
@@ -178,6 +180,7 @@ input editCategoryInput {
   isActive: Int
   parentId: ID
   timeCost: Int
+  description: String
 }
 
 input editFileInput {
@@ -212,6 +215,7 @@ input editProjhistorycatInput {
   parentId: Int
   project: ID
   timeCost: Int
+  description: String
 }
 
 input editProjtypeInput {
@@ -349,6 +353,7 @@ type Projhistorycat {
   parentId: Int
   project: Project
   timeCost: Int
+  description: String
 }
 
 input ProjhistorycatInput {
@@ -358,6 +363,7 @@ input ProjhistorycatInput {
   parentId: Int
   project: ID
   timeCost: Int
+  description: String
 }
 
 type Projtype {
