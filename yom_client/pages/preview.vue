@@ -132,6 +132,7 @@
     export default {
         name: "preview",
         layout: 'common',
+        middleware: 'authenticated',
         data(){
             return {
                 tipDialog: false,
