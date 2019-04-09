@@ -45,6 +45,7 @@
     export default {
         name: "project",
         layout: "common",
+        middleware: 'authenticated',
         data(){
             return {
                 itemColor:[
