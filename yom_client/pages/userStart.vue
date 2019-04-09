@@ -42,6 +42,7 @@
 </template>
 
 <script>
+    middleware: 'authenticated',
     export default {
         data(){
             return {
