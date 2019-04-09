@@ -78,6 +78,7 @@
 
     export default {
         layout: 'common',
+        middleware: 'authenticated',
         data () {
             return {
                 projName: "",
