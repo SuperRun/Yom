@@ -71,8 +71,12 @@
           const auth = {
             accessToken: 'response.jwt'
           };
+          const id = response.user.id;
           this.$store.commit('auth/setAuth', auth);// mutating to store for client rendering
+          this.$store.commit('auth/setId', id);// mutating to store for client rendering
           Cookie.set('auth', auth); // saving token in cookie for server rendering
+          console.log(this.$store.state.auth.id);
+          console.log(id),
           this.$router.push(`/userStart`)
         } catch (err) {
           this.loading = false;
