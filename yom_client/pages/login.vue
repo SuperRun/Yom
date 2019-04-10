@@ -14,6 +14,8 @@
         >
           <v-flex xs12>
             <v-form>
+              <span v-if="loading== false" style="color:red">{{ message }}</span>
+
               <v-text-field class="mx-auto white--text"
                             background-color="rgba(255,250,250,0.5)"
                             label="USERNAME/EMAIL"
@@ -31,6 +33,7 @@
                 :type="show1 ? 'text' : 'password'"
                 @click:append="show1 = !show1"
               ></v-text-field>
+
               <v-layout column
                         align-center
                         justify-center
@@ -61,12 +64,15 @@
         show2: true,
         email:'',
         password: '',
+        loading: true,
+        message:''
       }
     },
     methods:{
       async loginClick(){
         try {
           console.log("login Click")
+          this.loading = true
           const response = await strapi.login(this.email, this.password);
           const auth = {
             accessToken: 'response.jwt'
@@ -80,7 +86,10 @@
           this.$router.push(`/userStart`)
         } catch (err) {
           this.loading = false;
+          this.message = err.message;
+/*
           alert(err.message || 'An error occurred.')
+*/
         }
       }
     }
