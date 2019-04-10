@@ -36,8 +36,9 @@
       "type": "integer"
     },
     "user": {
-      "model": "yomuser",
-      "via": "projects"
+      "model": "user",
+      "via": "projects",
+      "plugin": "users-permissions"
     },
     "projhistorycats": {
       "collection": "projhistorycat",

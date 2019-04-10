@@ -26,10 +26,6 @@
     "isAdmin": {
       "default": "",
       "type": "integer"
-    },
-    "projects": {
-      "collection": "project",
-      "via": "user"
     }
   }
 }

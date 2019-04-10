@@ -210,7 +210,7 @@
                 await axios.post('http://localhost:1337/projects', {
                     projName: projNameShare,
                     description: descriptionShare,
-                    user: 1 // it will be changed if login function is available
+                    user: this.$store.state.auth.id
                 }).then((res) => {
                         const project = res.data.id;
                         console.log(project);

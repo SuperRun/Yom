@@ -40,7 +40,11 @@ export default {
   ** Plugins to load before mounting the App
   */
   plugins: [
-    '@/plugins/vuetify'
+    '@/plugins/vuetify',
+    {
+      src: '~/plugins/sw.js',
+      ssr: false
+    }
 
   ],
 
@@ -75,4 +79,5 @@ export default {
     extend(config, ctx) {
     }
   }
+
 }

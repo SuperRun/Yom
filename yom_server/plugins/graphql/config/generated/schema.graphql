@@ -242,6 +242,7 @@ input editUserInput {
   confirmed: Boolean
   blocked: Boolean
   role: ID
+  projects: [ID]
 }
 
 input editYomuserInput {
@@ -249,7 +250,6 @@ input editYomuserInput {
   password: String
   isActive: Int
   isAdmin: Int
-  projects: [ID]
 }
 
 input FileInput {
@@ -326,7 +326,7 @@ type Project {
   createTime: DateTime
   updateTime: DateTime
   isActive: Int
-  user: Yomuser
+  user: UsersPermissionsUser
   timeTotal: Int
   projhistorycats(sort: String, limit: Int, start: Int, where: JSON): [Projhistorycat]
 }
@@ -516,6 +516,7 @@ input UserInput {
   confirmed: Boolean
   blocked: Boolean
   role: ID
+  projects: [ID]
 }
 
 type UsersPermissionsMe {
@@ -561,6 +562,7 @@ type UsersPermissionsUser {
   confirmed: Boolean
   blocked: Boolean
   role: UsersPermissionsRole
+  projects(sort: String, limit: Int, start: Int, where: JSON): [Project]
 }
 
 type Yomuser {
@@ -571,7 +573,6 @@ type Yomuser {
   password: String
   isActive: Int
   isAdmin: Int
-  projects(sort: String, limit: Int, start: Int, where: JSON): [Project]
 }
 
 input YomuserInput {
@@ -579,5 +580,4 @@ input YomuserInput {
   password: String
   isActive: Int
   isAdmin: Int
-  projects: [ID]
 }

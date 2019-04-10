@@ -74,6 +74,7 @@
             await this.getProjects();
             this.projects=this.moreProjects;
             await this.getCount();
+            console.log('userId', this.$store.state.auth.id);
         },
         methods:{
             async loadMore(done){
@@ -92,7 +93,7 @@
                 this.moreProjects = await axios.get('http://localhost:1337/projects',{
                     params: {
                         isActive:1,
-                        user:1,
+                        user: this.$store.state.auth.id,
                         _sort:'created_at:DESC',
                         _start: (this.page-1)*this.limit,
                         _limit: this.limit,
@@ -109,7 +110,7 @@
                 this.count =await axios.get('http://localhost:1337/projects/count',{
                     params: {
                         isActive:1,
-                        user:1
+                        user: this.$store.state.auth.id
                     }
                 }).then((res)=>{
                     console.log(res.data);
