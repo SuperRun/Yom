@@ -4,15 +4,6 @@
             fluid
             grid-list-lg
     >
-        <!--<v-alert-->
-                <!--:value="warning"-->
-                <!--color="warning"-->
-                <!--icon="priority_high"-->
-                <!--outline-->
-                <!--class="warnHeight"-->
-        <!--&gt;-->
-            <!--Project name is required.-->
-        <!--</v-alert>-->
 
         <v-layout row wrap>
             <v-flex xs12>
@@ -36,13 +27,32 @@
                 <v-card color="white" >
                     <v-card-text v-for="(cat,index) in catTree"
                                  :key="index">
-                        <h2 class="themeColor--text">{{index+1}}.{{cat.category.catName}}</h2>
-                        <v-checkbox v-for="(child,index) in cat.childNodes"
-                                    v-model="selectedCats"
-                                    :label="`${child.category.catName + ' (' + child.category.timeCost + 'h)'}`"
-                                    :value="child.category.id"
-                                    :key="index"
-                                    class="checkboxHeight"></v-checkbox>
+                        <v-layout column>
+                            <v-flex xs12>
+                                <h2 class="themeColor--text">{{index+1}}.{{cat.category ? cat.category.catName : cat.catName}}</h2>
+                            </v-flex>
+                            <v-flex xs12
+                                    v-for="(child,j) in cat.childNodes"
+                                    :key="j">
+                                <v-layout row>
+                                    <v-flex xs10 class="checkboxMargin">
+                                        <v-checkbox v-model="selectedCats"
+                                                    :label="`${child.category ? child.category.catName : child.catName}`"
+                                                    :value="child.category ? child.category.id : child.id"
+                                                    hide-details
+                                                    class="checkboxHeight"></v-checkbox>
+                                    </v-flex>
+                                    <v-flex xs2>
+                                        <div class="timeCost"
+                                             @click="changeTimeCost(child,index,j)">
+                                            {{child.category ? child.category.timeCost : child.timeCost}}h
+                                        </div>
+                                    </v-flex>
+                                </v-layout>
+
+                            </v-flex>
+                        </v-layout>
+
                     </v-card-text>
                     <v-layout ma-0
                               column
@@ -54,7 +64,7 @@
                                 align-self-end>
                             <div>
                                 <span class="grey--text text--darken-1">Total Time: </span>
-                                <span class="grey--text text--darken-1">{{timeTotal}} h</span>
+                                <span class="grey--text text--darken-1">{{timeTotal || '0'}} h</span>
                             </div>
                         </v-flex>
                     </v-layout>
@@ -68,13 +78,54 @@
             </v-flex>
         </v-layout>
 
+        <v-dialog v-model="timeCostDialog"
+                  persistent
+                  max-width="600px">
+            <v-card>
+                <v-card-title>
+                    <span class="headline">Change Time Cost</span>
+                </v-card-title>
+                <v-card-text>
+                    <v-container grid-list-md>
+                        <v-layout wrap>
+                            <v-flex xs12>
+                                <v-subheader class="pl-0">Time Cost Value</v-subheader>
+                                <v-slider
+                                        v-model="slider"
+                                        :thumb-size="24"
+                                        thumb-label="always"
+                                        thumb-color="green darken-1"
+                                ></v-slider>
+                            </v-flex>
+                            <v-flex xs12>
+                                <v-textarea
+                                        v-model="comment"
+                                        outline
+                                        label="Comment"
+                                        value=""
+                                        color="green darken-1"
+                                ></v-textarea>
+                            </v-flex>
+                        </v-layout>
+                    </v-container>
+                </v-card-text>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn color="green darken-1" flat @click="timeCostDialog = false">Close</v-btn>
+                    <v-btn color="green darken-1" flat @click="saveTimeCost">Save</v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+
     </v-container>
 </template>
 
 <script>
     import axios from 'axios'
     import { createNamespacedHelpers } from 'vuex'
+    import { copyList } from 'assets/js/util'
     const { mapMutations, mapGetters } = createNamespacedHelpers('newProj')
+
 
     export default {
         layout: 'common',
@@ -84,15 +135,21 @@
                 projName: "",
                 description: "",
                 selectedCats:[],
-                // rules: {
-                //     required: value => !!value || 'The project name is required.'
-                // },
-                warning: false
+                warning: false,
+                timeCostDialog: false,
+                slider: 10,
+                comment: '',
+                parentIndex: -1,
+                childIndex: -1,
+                changedCatId: -1
             }
         },
         computed:{
-            type: function () {
+            type: function() {
                 return this.$route.query.type || '';
+            },
+            id: function() {
+                return this.$route.query.id || 0;
             },
             ...mapGetters([
                 'projNameShare',
@@ -107,7 +164,11 @@
         async created () {
 
             const vm = this;
-            if (!vm.type) {
+
+            console.log(!vm.type);
+            console.log(!vm.id);
+
+            if (!vm.type && !vm.id) {
                 vm.$router.replace({path:'/chooseType'});
             }
 
@@ -134,21 +195,13 @@
                     return res.data;
                 });
                 vm.setCatList(list);
-                vm.setCatTree(vm.convertToCatTree(vm.catList));
+                vm.convertToCatTree(vm.catList);
             }
+
         },
         watch: {
-            selectedCats(newSelectedCats, oldSelectedCats) {
-                const vm = this;
-                vm.setTimeTotal(0);
-                for (let i = 0; i < newSelectedCats.length; i++) {
-                    for (let cat of vm.catList) {
-                        if (cat.category.id === newSelectedCats[i]) {
-                            vm.calculateTimeTotal(cat.category.timeCost);
-                            break;
-                        }
-                    }
-                }
+            selectedCats() {
+                this.sumTotatTime();
             }
         },
         methods: {
@@ -157,57 +210,46 @@
                 'setDescriptionShare',
                 'setSelectedCatsShare',
                 'setCatTree',
+                'setCatTreeNode',
                 'setCatList',
+                'setCatListNode',
                 'setTimeTotal',
                 'calculateTimeTotal',
-                'setCheckedCatsTree'
+                'setCheckedCatsTree',
+                'convertToCatTree'
             ]),
-            convertToCatTree(catList) {
-                let catTree = catList.filter(cat => {
-                    return cat.category.parentId === null;
-                });
-                let childNodes = catList.filter(cat => {
-                    return cat.category.parentId != null;
-                });
-                for (let cat of catTree) {
-                    Object.assign(cat, {childNodes: []});
-                    for (let child of childNodes) {
-                        if (child.category.parentId === cat.category.id) {
-                            cat.childNodes.push(child);
-                        }
-                    }
-                }
-                return catTree;
-            },
-            preview () {
-                // this.validate();
-                this.convertCheckedCatsToTree();
-                this.setSelectedCatsShare(this);
-                this.setProjNameShare(this);
-                this.setDescriptionShare(this);
-                this.$router.push('/preview');
-
-            },
-            // validate () {
-            //     const vm =this;
-            //     if (vm.projName) {
-            //         vm.convertCheckedCatsToTree();
-            //         this.$router.push('/preview');
-            //     } else {
-            //         vm.warning=true;
-            //         setTimeout(() => (vm.warning = false), 2000);
+            // convertToCatTree(catList) {
+            //     let catTree = catList.filter(cat => {
+            //         return cat.category.parentId === null;
+            //     });
+            //     let childNodes = catList.filter(cat => {
+            //         return cat.category.parentId != null;
+            //     });
+            //     for (let cat of catTree) {
+            //         Object.assign(cat, {childNodes: []});
+            //         for (let child of childNodes) {
+            //             if (child.category.parentId === cat.category.id) {
+            //                 cat.childNodes.push(child);
+            //             }
+            //         }
             //     }
+            //     return catTree;
             // },
             convertCheckedCatsToTree(){
                 const vm = this;
-                let copyCatTree = vm.copyList(vm.catTree);
+                let copyCatTree = copyList(vm.catTree);
                 for (let copyCat of copyCatTree){
-                    copyCat.childNodes = vm.copyList(copyCat.childNodes);
+                    copyCat.childNodes = copyList(copyCat.childNodes);
                 }
                 for (let i=0; i < copyCatTree.length;) {
                     for (let j=0; j< copyCatTree[i].childNodes.length; ) {
-                        if (!vm.selectedCats.find(selectedCat => selectedCat === copyCatTree[i].childNodes[j].category.id)) {
-                            console.log('删除的id');
+                        if (!vm.selectedCats.find(selectedCat => {
+                            if (copyCatTree[i].childNodes[j].category) {
+                                return selectedCat === copyCatTree[i].childNodes[j].category.id
+                            } else {
+                                return selectedCat === copyCatTree[i].childNodes[j].id
+                            }
+                        })) {
                             copyCatTree[i].childNodes.splice(j,1);
                             j=0;
                         }else{
@@ -223,24 +265,85 @@
                 }
                 vm.setCheckedCatsTree(copyCatTree);
             },
-            copyList(arr){
-                return arr.map((e)=>{
-                    if(typeof e === 'object'){
-                        return Object.assign({},e)
-                    }else{
-                        return e
+            changeTimeCost(cat, parentIndex, childIndex){
+                this.parentIndex = parentIndex;
+                this.childIndex = childIndex;
+                this.timeCostDialog = true;
+                this.slider = cat.category ? cat.category.timeCost : cat.timeCost;
+                this.changedCatId = cat.id;
+            },
+            saveTimeCost(){
+                let copyCatTree = copyList(this.catTree);
+                const info = {
+                    'id': this.changedCatId,
+                    'parentIndex': this.parentIndex,
+                    'childIndex': this.childIndex,
+                    'objs': {
+                        'timeCost': this.slider,
+                        'comment': this.comment
                     }
-                })
+                }
+                if (this.parentIndex!=-1 && this.childIndex != -1) {
+                    this.setCatTreeNode(info);
+                    this.setCatListNode(info);
+                    this.sumTotatTime();
+                }
+                this.comment='';
+                this.timeCostDialog = false;
+                this.parentIndex = -1;
+                this.childIndex = -1;
+            },
+            sumTotatTime(){
+                const vm = this;
+                vm.setTimeTotal(0);
+                for (let i = 0; i < vm.selectedCats.length; i++) {
+                    for (let cat of vm.catList) {
+                        if (cat.category) {
+                            if (cat.category.id === vm.selectedCats[i]) {
+                                vm.calculateTimeTotal(cat.category.timeCost);
+                                break;
+                            }
+                        } else {
+                            if (cat.id === vm.selectedCats[i]) {
+                                vm.calculateTimeTotal(cat.timeCost);
+                                break;
+                            }
+                        }
+
+                    }
+                }
+            },
+            preview () {
+                this.convertCheckedCatsToTree();
+                this.setSelectedCatsShare(this.selectedCats);
+                this.setProjNameShare(this);
+                this.setDescriptionShare(this);
+                const url = this.id ? `/preview?id=${this.id}` : '/preview';
+                this.$router.push(url);
             }
         }
     }
 </script>
 
 <style>
-    .checkboxHeight,.warnHeight{
-        height: 20px;
+    .checkboxMargin *{
+        margin-bottom: 0;
+        margin-top: 0;
+    }
+    .checkboxHeight{
+        /*height: 20px;*/
+        padding: 0;
     }
     .btn{
         width: 50%;
+    }
+    .timeCost{
+        width: 40px;
+        line-height: 22px;
+        color: #6e7da2;
+        border: 1.3px solid #6e7da2;
+        border-radius: 22px;
+        text-align: center;
+        background-color: #fcf8f3;
     }
 </style>

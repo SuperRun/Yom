@@ -49,6 +49,14 @@
       }
     },
     {
+      "method": "PUT",
+      "path": "/projhistorycats",
+      "handler": "Projhistorycat.updateBulk",
+      "config": {
+        "policies": []
+      }
+    },
+    {
       "method": "DELETE",
       "path": "/projhistorycats/:id",
       "handler": "Projhistorycat.destroy",

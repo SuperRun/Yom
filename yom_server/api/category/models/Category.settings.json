@@ -15,10 +15,6 @@
       "default": "",
       "type": "string"
     },
-    "catconfig": {
-      "model": "catconfig",
-      "via": "category"
-    },
     "isActive": {
       "default": 1,
       "type": "integer"
@@ -33,6 +29,10 @@
     "description": {
       "default": "",
       "type": "text"
+    },
+    "catconfigs": {
+      "collection": "catconfig",
+      "via": "category"
     }
   }
 }

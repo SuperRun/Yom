@@ -21,9 +21,32 @@ const getters = {
 const mutations = {
     setProjNameShare: (state, payload) => (state.projNameShare = payload.projName),
     setDescriptionShare: (state, payload) => (state.descriptionShare = payload.description),
-    setSelectedCatsShare: (state, payload) => (state.selectedCatsShare = payload.selectedCats),
+    setSelectedCatsShare: (state, selectedCats) => (state.selectedCatsShare = selectedCats),
     setCatTree: (state, catTree) => (state.catTree = catTree),
+    setCatTreeNode: (state, info) => {
+        console.log(state.catTree[info.parentIndex].childNodes[info.childIndex]["timeCost"]);
+        if (state.catTree[info.parentIndex].childNodes[info.childIndex].category) {
+            for (let key of Object.keys(info.objs)) {
+                state.catTree[info.parentIndex].childNodes[info.childIndex].category[key] = info.objs[key];
+            }
+        } else {
+            for (let key of Object.keys(info.objs)) {
+                console.log(`key=${key}`);
+                state.catTree[info.parentIndex].childNodes[info.childIndex][key] = info.objs[key];
+            }
+        }
+    },
     setCatList: (state, catList) => (state.catList = catList),
+    setCatListNode: (state, info) => {
+        for (let cat of state.catList) {
+            if (cat.id === info.id){
+                for (let key of Object.keys(info.objs)) {
+                    cat.category ? cat.category[key] = info.objs[key] : cat[key] = info.objs[key];
+                    break;
+                }
+            }
+        }
+    },
     setTimeTotal: (state, timeTotal) => (state.timeTotal = timeTotal),
     calculateTimeTotal: (state, costTime) => (state.timeTotal += costTime),
     setCheckedCatsTree: (state, checkedCatsTree) => (state.checkedCatsTree = checkedCatsTree),
@@ -37,6 +60,35 @@ const mutations = {
                 else state[key] = {}
             }
         })
+    },
+    convertToCatTree: (state, catList) =>{
+        state.catTree = catList.filter(cat => {
+            if(cat.category)
+                return cat.category.parentId === null;
+            else
+                return cat.parentId === null;
+        });
+        let childNodes = catList.filter(cat => {
+            if(cat.category)
+                return cat.category.parentId != null;
+            else
+                return cat.parentId != null;
+        });
+        for (let cat of state.catTree) {
+            Object.assign(cat, {childNodes: []});
+            for (let child of childNodes) {
+                if (child.category) {
+                    if (child.category.parentId === cat.category.id) {
+                        cat.childNodes.push(child);
+                    }
+                }else{
+                    if (child.parentId === cat.catId) {
+                        cat.childNodes.push(child);
+                    }
+                }
+
+            }
+        }
     }
 }
 

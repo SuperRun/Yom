@@ -73,6 +73,16 @@ module.exports = {
   },
 
   /**
+   * Update a/an projhistorycat record.
+   *
+   * @return {Object}
+   */
+
+  updateBulk: async (ctx, next) => {
+    return strapi.services.projhistorycat.editBulk(ctx.params, ctx.request.body) ;
+  },
+
+  /**
    * Destroy a/an projhistorycat record.
    *
    * @return {Object}

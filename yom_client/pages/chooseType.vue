@@ -22,6 +22,8 @@
 
 <script>
     import axios from 'axios'
+    import {createIndexDB} from '../assets/js/workbox'
+
     export default {
         name: "chooseType",
         layout: 'common',
@@ -36,17 +38,13 @@
                 ]
             }
         },
-        created () {
-            console.log(this.title);
-            this.title = "Choose Type";
-            console.log(this.title);
-        },
         async asyncData ({ params }) {
             return await axios.get("http://localhost:1337/projtypes?isActive=1")
                 .then((res) => {
-                    console.log(res.data);
                     return { typeList: res.data }
             })
+        },
+        created(){
         }
     }
 </script>

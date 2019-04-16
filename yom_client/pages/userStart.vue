@@ -4,7 +4,7 @@
       <v-flex xs12>
         <v-layout row align-center font-weight-medium>
           <v-flex xs2>
-            <v-btn icon>
+            <v-btn icon to="/search">
               <v-icon color="#ffffff">search</v-icon>
             </v-btn>
           </v-flex>
@@ -20,13 +20,11 @@
       </v-flex>
       <v-flex xs12></v-flex>
       <v-flex xs12
-              class="lighter"
-      >
+              class="lighter">
         <v-layout column
                   align-center
                   justify-center
-                  mt-5
-        >
+                  mt-5>
           <v-flex xs6 class="flex-width">
             <v-btn to="/chooseType"  class="themeColor white--text btn-width" >Create a new project</v-btn>
           </v-flex>

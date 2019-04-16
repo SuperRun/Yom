@@ -73,6 +73,7 @@
         try {
           console.log("login Click")
           this.loading = true
+
           const response = await strapi.login(this.email, this.password);
           const auth = {
             accessToken: 'response.jwt'
@@ -81,6 +82,7 @@
           this.$store.commit('auth/setAuth', auth);// mutating to store for client rendering
           this.$store.commit('auth/setId', id);// mutating to store for client rendering
           Cookie.set('auth', auth); // saving token in cookie for server rendering
+
           console.log(this.$store.state.auth.id);
           console.log(id),
           this.$router.push(`/userStart`)

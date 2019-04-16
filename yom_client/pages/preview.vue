@@ -5,25 +5,31 @@
                   column
                   wrap
                   >
-            <v-flex class="headline font-weight-medium"
+            <v-flex class="font-weight-medium"
                     align-self-center
                     mb-3>
-                {{projNameShare || 'No project name'}}
+                <h1>{{projNameShare || 'No project name'}}</h1>
             </v-flex>
             <v-flex>
                 <div>
-                    <p><strong>Description:</strong>{{descriptionShare || 'No description'}}</p>
+                    <p class="subheading"><strong>Description:</strong>{{descriptionShare || 'No description'}}</p>
                 </div>
             </v-flex>
             <v-flex mb-3
                     v-for="(cat, index) in checkedCatsTree"
                     :key="index">
-                <h3>{{index+1}}.{{cat.category.catName}}</h3>
+                <h2>{{index+1}}.{{cat.category ? cat.category.catName : cat.catName}}</h2>
                 <ul>
                     <li v-for="(child,index) in cat.childNodes"
                         :key="index">
-                        <h3>{{child.category.catName}}</h3>
-                        <p>{{child.category.description}}</p>
+                        <h3 class="subheading"><strong>{{child.category ? child.category.catName : child.catName}}</strong></h3>
+                        <h4 class="body-2">Time Cost: {{child.category ? child.category.timeCost : child.timeCost}} h</h4>
+                        <h4 class="body-2" v-if="child.category && child.category.comment">Note:</h4>
+                        <h4 class="body-2" v-if="child.comment">Note:</h4>
+                        <p v-if="child.category && child.category.comment" class="content ">{{child.category.comment}}</p>
+                        <p v-if="child.comment" class="content ">{{child.comment}}</p>
+                        <h4 class="body-2">Description:</h4>
+                        <p class="content">{{child.category ? child.category.description : child.description}}</p>
                     </li>
                 </ul>
             </v-flex>
@@ -35,12 +41,16 @@
                     mb-3>
                 <div>
                     <span>Total Time: </span>
-                    <span>{{timeTotal}} h</span>
+                    <span>{{timeTotal || '0'}} h</span>
                 </div>
             </v-flex>
             <v-flex align-self-center
                     class="flex-width">
-                <v-btn class="themeColor btn white--text mx-auto" @click="validateProjName">Save</v-btn>
+                <v-btn class="themeColor btn white--text mx-auto"
+                       v-if="id"
+                       :to="`/detail?id=${id}`">Edit</v-btn>
+                <v-btn class="themeColor btn white--text mx-auto"
+                       @click="validateProjName">Save</v-btn>
             </v-flex>
         </v-layout>
 
@@ -69,7 +79,7 @@
                     <v-btn
                             color="green darken-1"
                             flat="flat"
-                            @click="saveProject"
+                            @click="saveOrUpdate"
                     >
                         Save
                     </v-btn>
@@ -138,10 +148,14 @@
                 tipDialog: false,
                 savingDialog: false,
                 fillDialog: false,
+                isSave: true,
                 projName: ''
             }
         },
         computed: {
+            id: function() {
+                return this.$route.query.id || 0;
+            },
             ...mapGetters([
                 'projNameShare',
                 'descriptionShare',
@@ -153,17 +167,24 @@
             ])
         },
         created (){
-            console.log(this.catList);
+            console.log(this.$route);
+            if(this.$route.query.id){
+                this.isSave = false;
+                console.log(this.$route.query.id);
+            }
         },
         methods:{
             ...mapMutations ([
                 'setProjNameShare',
                 'initData'
             ]),
+            edit(){
+                this.isSave = true;
+            },
             validateProjName(){
                 const vm =this;
                 if (vm.projNameShare) {
-                    vm.saveProject()
+                    vm.tipDialog = true;
                 } else {
                     vm.fillDialog = true;
                 }
@@ -175,24 +196,42 @@
             createProjHistoryCats(project) {
                 const vm = this;
                 const projhistorycats = [];
-                console.log(vm.selectedCatsShare);
                 Array.from(vm.catList, cat => {
                     Object.assign(cat.category, {
                         isChecked: vm.selectedCatsShare.find(selectedCat => selectedCat === cat.category.id) ? 1 : 0
                     })
                 });
                 for (let cat of vm.catList) {
-                    let {catName, isChecked, parentId} = cat.category;
-                    let obj = {catName, isChecked, parentId, project};
+                    let {catName, isChecked, parentId, timeCost, comment} = cat.category;
+                    let obj = {catName, isChecked, parentId, timeCost, comment, project};
                     obj.catId = cat.category.id;
                     projhistorycats.push(obj);
                 }
                 return projhistorycats;
             },
+            saveOrUpdate(){
+                if (this.id){
+                    this.updateProject();
+                } else {
+                    saveProject();
+                }
+            },
+            async saveProject() {
+                const {projNameShare, descriptionShare} = this;
+                const vm = this;
+                vm.savingDialog = true;
+                await axios.post('http://localhost:1337/projects', {
+                    projName: projNameShare,
+                    description: descriptionShare,
+                    user: this.$store.state.auth.id
+                }).then((res) => {
+                        const project = res.data.id;
+                        vm.saveProjHistoryCats(project);
+                });
+            },
             async saveProjHistoryCats(project) {
                 const vm = this;
                 const projhistorycats = vm.createProjHistoryCats(project);
-                console.log(projhistorycats)
                 await axios.post('http://localhost:1337/projhistorycats', projhistorycats)
                     .then((res) => {
                         setTimeout(() => {
@@ -202,22 +241,32 @@
                         }, 1000);
                     });
             },
-            async saveProject() {
+            async updateProject () {
                 const {projNameShare, descriptionShare} = this;
                 const vm = this;
-                vm.tipDialog = false;
                 vm.savingDialog = true;
-                await axios.post('http://localhost:1337/projects', {
+                await axios.put('http://localhost:1337/projects/'+this.id, {
                     projName: projNameShare,
                     description: descriptionShare,
                     user: this.$store.state.auth.id
                 }).then((res) => {
-                        const project = res.data.id;
-                        console.log(project);
-                        vm.saveProjHistoryCats(project);
+                    console.log(res);
 
+                    vm.updateProjHistoryCats();
                 });
-            }
+            },
+            async updateProjHistoryCats() {
+                const vm = this;
+                console.log(this.catList);
+                await axios.put('http://localhost:1337/projhistorycats', this.catList)
+                    .then((res) => {
+                        setTimeout(() => {
+                            vm.savingDialog = false;
+                            vm.initData();
+                            vm.$router.replace('/project');
+                        }, 1000);
+                    });
+            },
         }
     }
 </script>
@@ -228,5 +277,10 @@
     }
     .btn{
         width: 100%;
+    }
+    .content{
+        padding: 3px;
+        border: 1px dashed rgba(30, 33, 37, 0.37);
+        border-radius: 3px;
     }
 </style>

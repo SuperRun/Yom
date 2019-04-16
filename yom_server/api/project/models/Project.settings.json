@@ -23,14 +23,6 @@
       "default": "",
       "type": "string"
     },
-    "createTime": {
-      "default": "",
-      "type": "date"
-    },
-    "updateTime": {
-      "default": "",
-      "type": "date"
-    },
     "isActive": {
       "default": 1,
       "type": "integer"
@@ -47,6 +39,10 @@
     "timeTotal": {
       "default": "",
       "type": "integer"
+    },
+    "projtype": {
+      "model": "projtype",
+      "via": "project"
     }
   }
 }

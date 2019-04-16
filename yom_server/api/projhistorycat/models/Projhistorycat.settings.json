@@ -38,6 +38,10 @@
     "description": {
       "default": "",
       "type": "text"
+    },
+    "comment": {
+      "default": "",
+      "type": "text"
     }
   }
 }

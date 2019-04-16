@@ -4,14 +4,14 @@ type Catconfig {
   created_at: DateTime!
   updated_at: DateTime!
   isActive: Int
-  category: Category
   projtype: Projtype
+  category: Category
 }
 
 input CatconfigInput {
   isActive: Int
-  category: ID
   projtype: ID
+  category: ID
 }
 
 type Category {
@@ -19,20 +19,20 @@ type Category {
   created_at: DateTime!
   updated_at: DateTime!
   catName: String
-  catconfig: Catconfig
   isActive: Int
   parentId: Category
   timeCost: Int
   description: String
+  catconfigs(sort: String, limit: Int, start: Int, where: JSON): [Catconfig]
 }
 
 input CategoryInput {
   catName: String
-  catconfig: ID
   isActive: Int
   parentId: ID
   timeCost: Int
   description: String
+  catconfigs: [ID]
 }
 
 input createCatconfigInput {
@@ -170,17 +170,17 @@ type deleteYomuserPayload {
 
 input editCatconfigInput {
   isActive: Int
-  category: ID
   projtype: ID
+  category: ID
 }
 
 input editCategoryInput {
   catName: String
-  catconfig: ID
   isActive: Int
   parentId: ID
   timeCost: Int
   description: String
+  catconfigs: [ID]
 }
 
 input editFileInput {
@@ -200,12 +200,11 @@ input editProjectInput {
   projName: String
   compName: String
   description: String
-  createTime: DateTime
-  updateTime: DateTime
   isActive: Int
   user: ID
   projhistorycats: [ID]
   timeTotal: Int
+  projtype: ID
 }
 
 input editProjhistorycatInput {
@@ -216,13 +215,14 @@ input editProjhistorycatInput {
   project: ID
   timeCost: Int
   description: String
+  comment: String
 }
 
 input editProjtypeInput {
   isActive: Int
   typeName: String
-  updateTime: DateTime
   catconfigs: [ID]
+  project: ID
 }
 
 input editRoleInput {
@@ -323,11 +323,10 @@ type Project {
   projName: String
   compName: String
   description: String
-  createTime: DateTime
-  updateTime: DateTime
   isActive: Int
   user: UsersPermissionsUser
   timeTotal: Int
+  projtype: Projtype
   projhistorycats(sort: String, limit: Int, start: Int, where: JSON): [Projhistorycat]
 }
 
@@ -335,12 +334,11 @@ input ProjectInput {
   projName: String
   compName: String
   description: String
-  createTime: DateTime
-  updateTime: DateTime
   isActive: Int
   user: ID
   projhistorycats: [ID]
   timeTotal: Int
+  projtype: ID
 }
 
 type Projhistorycat {
@@ -354,6 +352,7 @@ type Projhistorycat {
   project: Project
   timeCost: Int
   description: String
+  comment: String
 }
 
 input ProjhistorycatInput {
@@ -364,6 +363,7 @@ input ProjhistorycatInput {
   project: ID
   timeCost: Int
   description: String
+  comment: String
 }
 
 type Projtype {
@@ -372,15 +372,15 @@ type Projtype {
   updated_at: DateTime!
   isActive: Int
   typeName: String
-  updateTime: DateTime
+  project: Project
   catconfigs(sort: String, limit: Int, start: Int, where: JSON): [Catconfig]
 }
 
 input ProjtypeInput {
   isActive: Int
   typeName: String
-  updateTime: DateTime
   catconfigs: [ID]
+  project: ID
 }
 
 type Query {

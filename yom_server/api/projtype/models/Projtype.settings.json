@@ -19,12 +19,12 @@
       "default": "",
       "type": "string"
     },
-    "updateTime": {
-      "default": "",
-      "type": "date"
-    },
     "catconfigs": {
       "collection": "catconfig",
+      "via": "projtype"
+    },
+    "project": {
+      "model": "project",
       "via": "projtype"
     }
   }

@@ -15,12 +15,12 @@
       "default": 1,
       "type": "integer"
     },
-    "category": {
-      "model": "category",
-      "via": "catconfig"
-    },
     "projtype": {
       "model": "projtype",
+      "via": "catconfigs"
+    },
+    "category": {
+      "model": "category",
       "via": "catconfigs"
     }
   }

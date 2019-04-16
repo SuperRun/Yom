@@ -159,6 +159,31 @@ module.exports = {
   },
 
   /**
+   * Promise to edit projhistorycats.
+   *
+   * @return {Promise}
+   */
+  editBulk:  async (values) => {
+    let obj = {
+      'code': SUCCESS_CODE,
+      'msg': 'update successfully'
+    };
+    let editArr = [];
+    for (let index=0;index < values.length; index++) {
+      try {
+        await module.exports.edit(values[index]).then((val)=>{
+          editArr.push(val);
+        });
+      } catch (e) {
+        obj.code = FAIL_CODE;
+        obj.msg = 'update unsuccessfully';
+        return obj;
+      }
+    }
+    return obj;
+  },
+
+  /**
    * Promise to remove a/an projhistorycat.
    *
    * @return {Promise}
