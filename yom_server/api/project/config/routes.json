@@ -26,8 +26,16 @@
     },
     {
       "method": "POST",
-      "path": "/projects",
+      "path": "/project",
       "handler": "Project.create",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/projects",
+      "handler": "Project.addProj",
       "config": {
         "policies": []
       }

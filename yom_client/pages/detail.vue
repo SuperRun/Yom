@@ -38,7 +38,7 @@
                                     <v-flex xs10 class="checkboxMargin">
                                         <v-checkbox v-model="selectedCats"
                                                     :label="`${child.category ? child.category.catName : child.catName}`"
-                                                    :value="child.category ? child.category.id : child.id"
+                                                    :value="child.category ? child.category.id : (child.id?child.id:child.catId)"
                                                     hide-details
                                                     class="checkboxHeight"></v-checkbox>
                                     </v-flex>
@@ -121,7 +121,8 @@
 </template>
 
 <script>
-    import axios from 'axios'
+    import axios from '~/plugins/axios'
+    import { createIndexedDB, saveDataLocally, getLocalData, setLastUpdated } from 'assets/js/idbUtil'
     import { createNamespacedHelpers } from 'vuex'
     import { copyList } from 'assets/js/util'
     const { mapMutations, mapGetters } = createNamespacedHelpers('newProj')
@@ -129,7 +130,7 @@
 
     export default {
         layout: 'common',
-        middleware: 'authenticated',
+        // middleware: 'authenticated',
         data () {
             return {
                 projName: "",
@@ -158,19 +159,21 @@
                 'catTree',
                 'catList',
                 'timeTotal',
-                'checkedCatsTree'
+                'checkedCatsTree',
+                'projtype'
             ])
         },
         async created () {
 
-            const vm = this;
+            console.log('it is detail page');
 
-            console.log(!vm.type);
-            console.log(!vm.id);
+            const vm = this;
 
             if (!vm.type && !vm.id) {
                 vm.$router.replace({path:'/chooseType'});
             }
+
+            this.setProjtype(vm);
 
             if (vm.projNameShare) {
                 vm.projName = vm.projNameShare;
@@ -181,26 +184,41 @@
             }
 
             if (vm.selectedCatsShare.length){
+                console.log('selectedCatsShare',vm.selectedCatsShare);
                 vm.selectedCats = vm.selectedCatsShare;
             }
 
-            if (!vm.catList.length) {
-                const list = await axios.get('http://localhost:1337/catconfigs',{
-                    params: {
-                        projtype: this.type,
-                        isActive: 1
-                    }
-                }).then((res) => {
-                    console.log(res.data);
-                    return res.data;
-                });
-                vm.setCatList(list);
+            if (!vm.catList.length && vm.type) {
+
+                let CURRENT_VERSION = await vm.getDbVersion() || 1;
+
+                let dbPromise = await createIndexedDB('configcats-db', `configcats-${vm.type}`, CURRENT_VERSION);
+
+                if(!dbPromise.objectStoreNames.contains(`configcats-${vm.type}`)){
+                    dbPromise.close();
+                    dbPromise = await createIndexedDB('configcats-db', `configcats-${vm.type}`, CURRENT_VERSION + 1);
+                }
+
+                const configcats = await getLocalData(dbPromise, `configcats-${vm.type}`);
+                vm.setCatList(configcats);
                 vm.convertToCatTree(vm.catList);
+
+                await vm.getCatConfigs().then(async (data) => {
+                    if (JSON.stringify(configcats) !== JSON.stringify(data)) {
+                        console.log('data changed');
+                        vm.setCatList(data);
+                        vm.convertToCatTree(vm.catList);
+                        await saveDataLocally(dbPromise, `configcats-${vm.type}`, data);
+                    }
+                }).catch(async err => {
+                    console.log('Network requests have failed, this is expected if offline');
+                });
             }
 
         },
         watch: {
-            selectedCats() {
+            selectedCats () {
+                this.setSelectedCatsShare(this.selectedCats);
                 this.sumTotatTime();
             }
         },
@@ -216,26 +234,12 @@
                 'setTimeTotal',
                 'calculateTimeTotal',
                 'setCheckedCatsTree',
-                'convertToCatTree'
+                'convertToCatTree',
+                'convertCheckedCatTree',
+                'initData',
+                'setProjtype'
             ]),
-            // convertToCatTree(catList) {
-            //     let catTree = catList.filter(cat => {
-            //         return cat.category.parentId === null;
-            //     });
-            //     let childNodes = catList.filter(cat => {
-            //         return cat.category.parentId != null;
-            //     });
-            //     for (let cat of catTree) {
-            //         Object.assign(cat, {childNodes: []});
-            //         for (let child of childNodes) {
-            //             if (child.category.parentId === cat.category.id) {
-            //                 cat.childNodes.push(child);
-            //             }
-            //         }
-            //     }
-            //     return catTree;
-            // },
-            convertCheckedCatsToTree(){
+            convertCheckedCatsToTree () {
                 const vm = this;
                 let copyCatTree = copyList(vm.catTree);
                 for (let copyCat of copyCatTree){
@@ -265,14 +269,14 @@
                 }
                 vm.setCheckedCatsTree(copyCatTree);
             },
-            changeTimeCost(cat, parentIndex, childIndex){
+            changeTimeCost (cat, parentIndex, childIndex) {
                 this.parentIndex = parentIndex;
                 this.childIndex = childIndex;
                 this.timeCostDialog = true;
                 this.slider = cat.category ? cat.category.timeCost : cat.timeCost;
                 this.changedCatId = cat.id;
             },
-            saveTimeCost(){
+            saveTimeCost () {
                 let copyCatTree = copyList(this.catTree);
                 const info = {
                     'id': this.changedCatId,
@@ -293,7 +297,7 @@
                 this.parentIndex = -1;
                 this.childIndex = -1;
             },
-            sumTotatTime(){
+            sumTotatTime () {
                 const vm = this;
                 vm.setTimeTotal(0);
                 for (let i = 0; i < vm.selectedCats.length; i++) {
@@ -309,17 +313,34 @@
                                 break;
                             }
                         }
-
                     }
                 }
             },
             preview () {
-                this.convertCheckedCatsToTree();
-                this.setSelectedCatsShare(this.selectedCats);
                 this.setProjNameShare(this);
                 this.setDescriptionShare(this);
+                this.setSelectedCatsShare(this.selectedCats);
+                this.convertCheckedCatTree();
                 const url = this.id ? `/preview?id=${this.id}` : '/preview';
                 this.$router.push(url);
+            },
+            async getCatConfigs () {
+                return await axios.get('/catconfigs', {
+                    params: {
+                        projtype: this.type,
+                        isActive: 1
+                    }
+                }).then((res) => {
+                    return res.data;
+                })
+            },
+            async getDbVersion(){
+                const databases = await window.indexedDB.databases();
+                for (let db of databases) {
+                    if (db.name === 'configcats-db') {
+                        return db.version;
+                    }
+                } 
             }
         }
     }
@@ -327,12 +348,12 @@
 
 <style>
     .checkboxMargin *{
-        margin-bottom: 0;
-        margin-top: 0;
+        margin-bottom: 0 !important;
+        margin-top: 0 !important;
     }
     .checkboxHeight{
         /*height: 20px;*/
-        padding: 0;
+        padding: 0 !important;
     }
     .btn{
         width: 50%;

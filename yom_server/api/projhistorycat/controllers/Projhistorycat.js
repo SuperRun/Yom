@@ -79,7 +79,7 @@ module.exports = {
    */
 
   updateBulk: async (ctx, next) => {
-    return strapi.services.projhistorycat.editBulk(ctx.params, ctx.request.body) ;
+    return strapi.services.projhistorycat.editBulk(ctx.request.body) ;
   },
 
   /**

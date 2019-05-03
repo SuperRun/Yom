@@ -1,10 +1,12 @@
 import newProj from './modules/newProj';
+import indexedDB from './modules/indexedDB'
 import cookieparser from 'cookieparser'
 
 export  const namespaced = true;
 
 export const modules ={
-    newProj
+    newProj,
+    indexedDB
 }
 
 export const actions ={

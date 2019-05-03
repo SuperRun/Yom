@@ -37,14 +37,14 @@
 </template>
 
 <script>
-    import axios from 'axios'
-    import { copyList } from 'assets/js/util'
+    import axios from '~/plugins/axios'
     import Vue from 'vue'
-    import { createNamespacedHelpers } from 'vuex'
     import EasyRefresh from 'vue-easyrefresh'
-    Vue.use(EasyRefresh)
-
-    const { mapMutations, mapGetters } = createNamespacedHelpers('newProj')
+    Vue.use(EasyRefresh);
+    import { createIndexedDB, saveDataLocally, setLastUpdated, searchProjs, getProjsByDate } from 'assets/js/idbUtil'
+    import { createNamespacedHelpers } from 'vuex'
+    import { copyList } from 'assets/js/util'
+    const { mapMutations, mapGetters } = createNamespacedHelpers('newProj');
 
     export default {
         name: "project",
@@ -57,7 +57,6 @@
                     'timelineColor2',
                     'timelineColor3'
                 ],
-                projects: [],
                 moreProjects: [],
                 startTime: '',
                 endTime: '',
@@ -68,11 +67,13 @@
             }
         },
         computed: {
-
             itemColorText() {
                 return this.itemColor.map((item)=>{
                     return item += '--text';
                 });
+            },
+            projects(){
+                return this.$store.state.indexedDB.projects;
             },
             ...mapGetters([
                 'projNameShare',
@@ -85,10 +86,38 @@
             ])
         },
         async created () {
-            await this.getProjects();
-            this.projects=this.moreProjects;
-            await this.getCount();
-            console.log('userId', this.$store.state.auth.id);
+            const vm = this;
+            await vm.getProjects().then(async (data) => {
+
+                const dbPromise = await createIndexedDB('projects-db', 'projects',1,['date']);
+                vm.$store.commit('indexedDB/setProjects',vm.moreProjects);
+
+                await saveDataLocally(dbPromise, 'projects', vm.projects)
+                    .then(()=>(setLastUpdated(new Date())))
+                    .catch(err=>(console.log(`Save Data Error: ${err}`)));
+
+                dbPromise.close();
+
+            }).catch(async err => {
+                const { endTime, projName, startTime } = this.$route.query;
+                const query = { endTime, projName, startTime };
+
+                console.log('Network requests have failed, this is expected if offline');
+                const dbPromise = await createIndexedDB('projects-db', 'projects',1);
+                let projects = [];
+                if (!Object.keys(this.$route.query).length){
+                    projects = await getProjsByDate(dbPromise);
+                    projects.reverse();
+                    console.log(projects);
+                } else {
+                    const { endTime, projName, startTime } = this.$route.query;
+                    const query = { endTime, projName, startTime };
+                    projects = await searchProjs(dbPromise, query);
+
+                }
+                vm.$store.commit('indexedDB/setProjects', projects);
+                dbPromise.close();
+            });
         },
         methods:{
             ...mapMutations ([
@@ -101,49 +130,32 @@
                 'setCatListNode',
                 'setTimeTotal',
                 'setCheckedCatsTree',
-                'convertToCatTree'
+                'convertToCatTree',
+                'convertCheckedCatTree'
             ]),
             edit (proj) {
-                console.log(proj.projhistorycats);
-                this.convertToCatTree(proj.projhistorycats);
+                console.log(proj);
                 this.setCatList(proj.projhistorycats);
+                this.convertToCatTree(proj.projhistorycats);
                 this.setProjNameShare(proj);
                 this.setDescriptionShare(proj);
                 this.setTimeTotal(proj.timeTotal);
-                this.convertCheckedCatsToTree(this.catTree);
                 this.getSelectedCatsShare();
+                this.convertCheckedCatTree();
+                console.log('catList');
+                console.log(this.catList);
+                console.log('catTree');
+                console.log(this.catTree);
+                console.log('checkedCatsTree');
+                console.log(this.checkedCatsTree);
                 this.$router.push(`/preview?id=${proj.id}`);
-            },
-            convertCheckedCatsToTree(catTree){
-                let copyCatTree = copyList(catTree);
-                for (let copyCat of copyCatTree){
-                    copyCat.childNodes = copyList(copyCat.childNodes);
-                }
-
-                for (let i=0; i < copyCatTree.length;) {
-                    for (let j=0; j< copyCatTree[i].childNodes.length; ) {
-                        if (copyCatTree[i].childNodes.isChecked === 0) {
-                            copyCatTree[i].childNodes.splice(j,1);
-                            j=0;
-                        }else{
-                            j++;
-                        }
-                    }
-                    if (copyCatTree[i].childNodes.length === 0) {
-                        copyCatTree.splice(i,1);
-                        i=0;
-                    }else{
-                        i++;
-                    }
-                }
-                this.setCheckedCatsTree(copyCatTree);
             },
             getSelectedCatsShare(){
                 let selectedCats = this.catList.map(cat=> {
-                    if(cat.isChecked){
-                        return cat.id;
+                    if(cat.isChecked && cat.parentId){
+                        return cat.id?cat.id:cat.catId;
                     }
-                }).filter(cat => cat);
+                }).filter(cat=>cat);
                 this.setSelectedCatsShare(selectedCats);
                 console.log(selectedCats);
             },
@@ -151,7 +163,13 @@
                 if ((this.page * this.limit) <= this.count) {
                     ++this.page;
                     await this.getProjects();
-                    this.projects = this.projects.concat(this.moreProjects);
+                    this.$store.commit('indexedDB/loadProjects', this.moreProjects);
+                    // this.projects = this.projects.concat(this.moreProjects);
+                    const dbPromise = await createIndexedDB('projects-db', 'projects');
+                    await saveDataLocally(dbPromise, 'projects', this.projects)
+                        .then(()=>(setLastUpdated(new Date())))
+                        .catch(err=>(console.log(`Save Data Error: ${err}`)));
+                    dbPromise.close();
                     done(true);
                 } else {
                     done(false);
@@ -160,7 +178,7 @@
             async getProjects(){
                 const { endTime, projName, startTime } = this.$route.query;
 
-                this.moreProjects = await axios.get('http://localhost:1337/projects',{
+                this.moreProjects = await axios.get('/projects',{
                     params: {
                         isActive:1,
                         user: this.$store.state.auth.id,
@@ -179,7 +197,7 @@
             async getCount(){
                 const { endTime, projName, startTime } = this.$route.query;
 
-                this.count =await axios.get('http://localhost:1337/projects/count',{
+                this.count =await axios.get('/projects/count',{
                     params: {
                         isActive:1,
                         user: this.$store.state.auth.id,
@@ -189,7 +207,6 @@
                     }
                 }).then((res)=>{
                     console.log(res.data);
-
                     return res.data
                 });
             }

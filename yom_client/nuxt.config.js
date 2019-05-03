@@ -1,6 +1,8 @@
 import VuetifyLoaderPlugin from 'vuetify-loader/lib/plugin'
 import pkg from './package'
-
+const workbox = async () => {
+    return await window.$workbox
+};
 export default {
   mode: 'universal',
 
@@ -42,11 +44,7 @@ export default {
   */
   plugins: [
     '@/plugins/vuetify',
-    {
-      src: '~/plugins/sw.js',
-      ssr: false
-    }
-
+    '@/plugins/axios'
   ],
 
   /*
@@ -61,6 +59,24 @@ export default {
   */
   manifest: {
       name: "YOM"
+  },
+
+  /*
+  ** Workbox configuration
+  */
+  workbox: {
+      swURL: 'custom-sw.js'
+      // runtimeCaching:[{
+      //     urlPattern: new RegExp('http://localhost:1337/projects'),
+      //     handler: 'networkOnly',
+      //     method: 'POST',
+      //     strategyOptions: {
+      //         //background sync. conf
+      //         plugins: [{
+      //             name: 'backgroundSync',
+      //         }]
+      //     }
+      // }]
   },
 
   /*
@@ -79,6 +95,9 @@ export default {
     */
     extend(config, ctx) {
     }
+  },
+  env: {
+    baseUrl: process.env.BASE_URL || 'http://localhost:1337'
   }
 
 }

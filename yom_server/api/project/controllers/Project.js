@@ -54,6 +54,16 @@ module.exports = {
   },
 
   /**
+   * Create a/an project record.
+   * And create projhistorycats
+   *
+   * @return {Object}
+   */
+  addProj: async (ctx) => {
+    return strapi.services.project.addProjAndHistoryCats(ctx.request.body);
+  },
+
+  /**
    * Update a/an project record.
    *
    * @return {Object}

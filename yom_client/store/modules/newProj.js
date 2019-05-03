@@ -1,3 +1,5 @@
+import {copyList} from "../../assets/js/util";
+
 const state = () => ({
     projNameShare: "",
     descriptionShare: "",
@@ -5,7 +7,10 @@ const state = () => ({
     catTree: [],
     catList: [],
     checkedCatsTree: [],
-    timeTotal: 0
+    timeTotal: 0,
+    newProject: {},
+    configCatsDbVersion: 0,
+    projtype: 0
 });
 
 const getters = {
@@ -15,14 +20,19 @@ const getters = {
     catTree: state => state.catTree,
     catList: state => state.catList,
     timeTotal: state => state.timeTotal,
-    checkedCatsTree: state => state.checkedCatsTree
+    checkedCatsTree: state => state.checkedCatsTree,
+    newProject: state => state.newProject,
+    configCatsDbVersion: state => state.configCatsDbVersion,
+    projtype: state => state.projtype
 }
 
 const mutations = {
+    setProjtype: (state, payload) => (state.projtype = payload.type),
     setProjNameShare: (state, payload) => (state.projNameShare = payload.projName),
     setDescriptionShare: (state, payload) => (state.descriptionShare = payload.description),
     setSelectedCatsShare: (state, selectedCats) => (state.selectedCatsShare = selectedCats),
     setCatTree: (state, catTree) => (state.catTree = catTree),
+    setNewProject: (state, newProject) => (state.newProject = newProject),
     setCatTreeNode: (state, info) => {
         console.log(state.catTree[info.parentIndex].childNodes[info.childIndex]["timeCost"]);
         if (state.catTree[info.parentIndex].childNodes[info.childIndex].category) {
@@ -62,13 +72,15 @@ const mutations = {
         })
     },
     convertToCatTree: (state, catList) =>{
-        state.catTree = catList.filter(cat => {
+        let copyCatList = copyList(catList);
+
+        state.catTree = copyCatList.filter(cat => {
             if(cat.category)
                 return cat.category.parentId === null;
             else
                 return cat.parentId === null;
         });
-        let childNodes = catList.filter(cat => {
+        let childNodes = copyCatList.filter(cat => {
             if(cat.category)
                 return cat.category.parentId != null;
             else
@@ -89,6 +101,43 @@ const mutations = {
 
             }
         }
+    },
+    convertCheckedCatTree(state){
+
+        let copyCatTree = copyList(state.catTree);
+        for (let copyCat of copyCatTree){
+            copyCat.childNodes = copyList(copyCat.childNodes);
+        }
+        for (let i=0; i < copyCatTree.length;) {
+            for (let j=0; j< copyCatTree[i].childNodes.length; ) {
+                if (!state.selectedCatsShare.find(selectedCat => {
+                    if (copyCatTree[i].childNodes[j].category) {
+                        return selectedCat === copyCatTree[i].childNodes[j].category.id
+                    } else {
+                        return copyCatTree[i].childNodes[j].id? selectedCat === copyCatTree[i].childNodes[j].id: selectedCat === copyCatTree[i].childNodes[j].catId;
+                    }
+                })) {
+                    copyCatTree[i].childNodes.splice(j,1);
+                    j=0;
+                }else{
+                    j++;
+                }
+            }
+            if (copyCatTree[i].childNodes.length === 0) {
+                copyCatTree.splice(i,1);
+                i=0;
+            }else{
+                i++;
+            }
+        }
+        console.log('copyCatTree');
+        console.log(copyCatTree);
+        state.checkedCatsTree = copyCatTree;
+    },
+    updateCatList(state){
+        state.catList.map(cat =>{
+            state.selectedCatsShare.find(selectedCat => (cat.id?selectedCat === cat.id:selectedCat === cat.catId))?cat.isChecked=1:cat.isChecked=0;
+        })
     }
 }
 

@@ -147,6 +147,8 @@ module.exports = {
    */
 
   edit: async (params, values) => {
+    console.log(params);
+    console.log(values);
     // Extract values related to relational data.
     const relations = _.pick(values, Projhistorycat.associations.map(ast => ast.alias));
     const data = _.omit(values, Projhistorycat.associations.map(ast => ast.alias));
@@ -171,8 +173,12 @@ module.exports = {
     let editArr = [];
     for (let index=0;index < values.length; index++) {
       try {
-        await module.exports.edit(values[index]).then((val)=>{
+        await module.exports.edit({id:`${values[index].id}`},values[index]).then((val)=>{
           editArr.push(val);
+        }).catch((err)=>{
+          obj.code = FAIL_CODE;
+          obj.msg = err;
+          return obj;
         });
       } catch (e) {
         obj.code = FAIL_CODE;

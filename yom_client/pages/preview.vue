@@ -131,13 +131,40 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
+
+        <v-dialog
+                v-model="isOffline"
+                max-width="290"
+        >
+            <v-card>
+                <v-card-title class="headline">Tip</v-card-title>
+
+                <v-card-text>
+                    Sorry, please check your network.
+                </v-card-text>
+
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+
+                    <v-btn
+                            color="green darken-1"
+                            flat="flat"
+                            @click="isOffline=true">
+                        OK
+                    </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+
     </v-container>
 </template>
 
 <script>
     import { createNamespacedHelpers } from 'vuex'
-    import axios from 'axios'
-    const { mapGetters, mapMutations, initData } = createNamespacedHelpers('newProj')
+    import { createIndexedDB, getLocalData, addDataLocally, fetchApi, updateProj } from 'assets/js/idbUtil'
+    import { getNowFormatDate } from 'assets/js/util'
+    import axios from '~/plugins/axios'
+    const { mapGetters, mapMutations } = createNamespacedHelpers('newProj')
 
     export default {
         name: "preview",
@@ -149,6 +176,7 @@
                 savingDialog: false,
                 fillDialog: false,
                 isSave: true,
+                isOffline: false,
                 projName: ''
             }
         },
@@ -163,12 +191,13 @@
                 'catTree',
                 'catList',
                 'timeTotal',
-                'checkedCatsTree'
+                'checkedCatsTree',
+                'projtype'
             ])
         },
         created (){
             console.log(this.$route);
-            if(this.$route.query.id){
+            if(this.id){
                 this.isSave = false;
                 console.log(this.$route.query.id);
             }
@@ -176,96 +205,172 @@
         methods:{
             ...mapMutations ([
                 'setProjNameShare',
-                'initData'
+                'initData',
+                'updateCatList'
             ]),
             edit(){
                 this.isSave = true;
             },
             validateProjName(){
                 const vm =this;
-                if (vm.projNameShare) {
-                    vm.tipDialog = true;
-                } else {
-                    vm.fillDialog = true;
-                }
+                if (vm.projNameShare) {vm.tipDialog = true;}
+                else {vm.fillDialog = true;}
             },
             saveProjName(){
                 this.setProjNameShare(this);
                 this.fillDialog = false;
             },
-            createProjHistoryCats(project) {
+            createProjHistoryCats() {
                 const vm = this;
-                const projhistorycats = [];
-                Array.from(vm.catList, cat => {
-                    Object.assign(cat.category, {
+                let projhistorycats = [];
+                for (let cat of vm.catList) {
+                    let { catName, parentId, timeCost, comment, description } = cat.category;
+                    let obj = { catName, parentId, timeCost, comment, description };
+                    Object.assign(obj, {
                         isChecked: vm.selectedCatsShare.find(selectedCat => selectedCat === cat.category.id) ? 1 : 0
                     })
-                });
-                for (let cat of vm.catList) {
-                    let {catName, isChecked, parentId, timeCost, comment} = cat.category;
-                    let obj = {catName, isChecked, parentId, timeCost, comment, project};
                     obj.catId = cat.category.id;
                     projhistorycats.push(obj);
                 }
                 return projhistorycats;
             },
-            saveOrUpdate(){
+            async saveOrUpdate(){
                 if (this.id){
                     this.updateProject();
                 } else {
-                    saveProject();
+                    await this.saveProject();
                 }
             },
             async saveProject() {
                 const {projNameShare, descriptionShare} = this;
                 const vm = this;
+                vm.tipDialog = false;
                 vm.savingDialog = true;
-                await axios.post('http://localhost:1337/projects', {
+                const newProj = {
                     projName: projNameShare,
                     description: descriptionShare,
-                    user: this.$store.state.auth.id
-                }).then((res) => {
-                        const project = res.data.id;
-                        vm.saveProjHistoryCats(project);
-                });
-            },
-            async saveProjHistoryCats(project) {
-                const vm = this;
-                const projhistorycats = vm.createProjHistoryCats(project);
-                await axios.post('http://localhost:1337/projhistorycats', projhistorycats)
-                    .then((res) => {
+                    timeTotal: vm.timeTotal,
+                    user: vm.$store.state.auth.id,
+                    projtype: vm.projtype,
+                    projhistorycats: vm.createProjHistoryCats()
+                }
+                await fetchApi('http://localhost:1337/projects', 'POST', newProj).then(res => {
+                    console.log(res);
+                    if (res.ok) {
                         setTimeout(() => {
                             vm.savingDialog = false;
                             vm.initData();
                             vm.$router.replace('/project');
                         }, 1000);
-                    });
+                    }
+                }).catch(async err => {
+                    const STORE_NAME = 'projects';
+                    const DB_NAME = 'projects-db';
+
+                    // if ('serviceWorker' in navigator && 'SyncManager' in window) {
+                    //
+                    //     navigator.serviceWorker.ready.then(async(registration) => {
+                    //         const dbPromise = await createIndexedDB(DB_NAME, STORE_NAME);
+                    //         Object.assign(newProj,{
+                    //             created_at: getNowFormatDate()
+                    //         });
+                    //         const key = await addDataLocally(dbPromise, STORE_NAME, newProj);
+                    //         const tag = {
+                    //             name: 'projects_create_sync',
+                    //             request: new Request('http://localhost:1337/projects',{
+                    //                 method: 'POST',
+                    //                 body: newProj
+                    //             })
+                    //         };
+                    //         registration.sync.register(tag).then( async ()=> {
+                    //             console.log('后台同步已触发', tag);
+                    //         }).catch(function (err) {
+                    //             console.log('后台同步触发失败', err);
+                    //         });
+                    //     });
+                    // }
+
+                    if ('serviceWorker' in navigator) {
+                        navigator.serviceWorker.getRegistrations().then((registrations) => {
+                            for (const worker of registrations) {
+                                console.log('Service worker:', worker);
+                                worker.sync.register('tag').then( async ()=> {
+                                    console.log('后台同步已触发', 'tag');
+                                }).catch(function (err) {
+                                    console.log('后台同步触发失败', err);
+                                });
+                            }
+
+                        });
+                    }
+
+
+                    console.log(`save a project failed:${err}`);
+
+                    setTimeout(() => {
+                        vm.savingDialog = false;
+                        vm.isOffline = true;
+                        vm.initData();
+                        vm.$router.replace('/project');
+                    }, 1000);
+                });
             },
             async updateProject () {
                 const {projNameShare, descriptionShare} = this;
                 const vm = this;
+                vm.tipDialog = false;
                 vm.savingDialog = true;
-                await axios.put('http://localhost:1337/projects/'+this.id, {
+                await axios.put('/projects/'+this.id, {
                     projName: projNameShare,
                     description: descriptionShare,
-                    user: this.$store.state.auth.id
+                    user: this.$store.state.auth.id,
+                    timeTotal: this.timeTotal
                 }).then((res) => {
                     console.log(res);
-
                     vm.updateProjHistoryCats();
+                }).catch(async err=>{
+                    console.log(`update a project failed:${err}`);
+                    // update the data in indexeddb
+                    vm.updateCatList();
+                    const editProj = {
+                        projName: projNameShare,
+                        description: descriptionShare,
+                        timeTotal: this.timeTotal,
+                        user: this.$store.state.auth.id,
+                        projtype: this.projtype,
+                        projhistorycats: this.catList
+                    };
+                    const dbPromise = await createIndexedDB('projects-db', 'projects', 1);
+                    await updateProj(dbPromise, this.id, editProj);
+                    dbPromise.close();
+
+                    setTimeout(() => {
+                        vm.savingDialog = false;
+                        vm.isOffline = true;
+                        vm.initData();
+                        vm.$router.replace('/project');
+                    }, 1000);
                 });
             },
             async updateProjHistoryCats() {
                 const vm = this;
+
+                this.tipDialog = false;
+
+                console.log(this.selectedCatsShare);
+
+                vm.updateCatList();
+
                 console.log(this.catList);
-                await axios.put('http://localhost:1337/projhistorycats', this.catList)
-                    .then((res) => {
-                        setTimeout(() => {
-                            vm.savingDialog = false;
-                            vm.initData();
-                            vm.$router.replace('/project');
-                        }, 1000);
-                    });
+
+                await axios.put('/projhistorycats', this.catList)
+                .then((res) => {
+                    setTimeout(() => {
+                        vm.savingDialog = false;
+                        vm.initData();
+                        vm.$router.replace('/project');
+                    }, 1000);
+                });
             },
         }
     }

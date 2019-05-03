@@ -12,7 +12,7 @@
                         </div>
                     </v-card-title>
                     <v-card-actions>
-                        <v-btn :to="`/detail?type=${type.id}`" flat dark>Choose now</v-btn>
+                        <v-btn @click="goToDetail(type.id)" flat dark>Choose now</v-btn>
                     </v-card-actions>
                 </v-card>
             </v-flex>
@@ -21,8 +21,10 @@
 </template>
 
 <script>
-    import axios from 'axios'
-    import {createIndexDB} from '../assets/js/workbox'
+    import axios from '~/plugins/axios'
+    import { createIndexedDB, saveDataLocally, getLocalData, setLastUpdated } from 'assets/js/idbUtil'
+    import { createNamespacedHelpers } from 'vuex'
+    const {  mapMutations } = createNamespacedHelpers('newProj')
 
     export default {
         name: "chooseType",
@@ -35,16 +37,47 @@
                     'blue-grey',
                     'teal',
                     'light-green'
-                ]
+                ],
+                typeList: []
             }
         },
-        async asyncData ({ params }) {
-            return await axios.get("http://localhost:1337/projtypes?isActive=1")
-                .then((res) => {
-                    return { typeList: res.data }
-            })
+        async created(){
+
+            const vm = this;
+            const dbPromise = await createIndexedDB('types-db', 'types');
+
+            vm.typeList = await getLocalData(dbPromise, 'types');
+
+            console.log('typeList', vm.typeList);
+
+            await vm.getProjTypes().then(async (data) => {
+                if (JSON.stringify(vm.typeList) !== JSON.stringify(data)) {
+                    console.log('data changed');
+                    vm.typeList = data;
+                    await saveDataLocally(dbPromise, 'types', vm.typeList);
+                }
+            }).catch(async err => {
+                console.log('Network requests have failed, this is expected if offline');
+            });
+
         },
-        created(){
+        methods: {
+            ...mapMutations ([
+                'initData'
+            ]),
+            goToDetail (id) {
+                this.initData();
+                this.$router.push(`/detail?type=${id}`);
+            },
+            async getProjTypes () {
+                return await axios.get('/projtypes', {
+                    params: {
+                        isActive: 1
+                    }
+                }).then((res) => {
+                    return res.data;
+                })
+            }
         }
     }
 </script>

@@ -13,6 +13,9 @@ const _ = require('lodash');
 // Strapi utilities.
 const utils = require('strapi-hook-bookshelf/lib/utils/');
 
+// Projhistorycat addbulk
+const projhistorycat = require('../../projhistorycat/services/Projhistorycat');
+
 module.exports = {
 
   /**
@@ -33,7 +36,7 @@ module.exports = {
       _.forEach(filters.where, (where, key) => {
         if (_.isArray(where.value) && where.symbol !== 'IN' && where.symbol !== 'NOT IN') {
           for (const value in where.value) {
-            qb[value ? 'where' : 'orWhere'](key, where.symbol, where.value[value])
+            qb[value ? 'where' : 'orWhere'](key, where.symbol, where.value[value]);
           }
         } else {
           qb.where(key, where.symbol, where.value);
@@ -108,6 +111,22 @@ module.exports = {
     // Create relational data and return the entry.
     return Project.updateRelations({ id: entry.id , values: relations });
   },
+
+  /**
+   * Promise to add a/an project and projhistorycats.
+   *
+   * @return {Promise}
+   */
+  addProjAndHistoryCats: async (values) => {
+    const data = await module.exports.add(values);
+    console.log(data.id);
+    Array.from(values.projhistorycats, cat => {
+      Object.assign(cat, {project: data.id});
+    });
+    const obj = projhistorycat.addBulk(values.projhistorycats);
+    return obj;
+  },
+
 
   /**
    * Promise to edit a/an project.
