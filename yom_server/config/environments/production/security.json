@@ -51,7 +51,8 @@
       "Content-Type",
       "Authorization",
       "X-Frame-Options",
-      "Origin"
+      "Origin",
+      "X-Mark-Id"
     ]
   },
   "ip": {

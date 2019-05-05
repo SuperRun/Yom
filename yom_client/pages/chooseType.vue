@@ -22,7 +22,7 @@
 
 <script>
     import axios from '~/plugins/axios'
-    import { createIndexedDB, saveDataLocally, getLocalData, setLastUpdated } from 'assets/js/idbUtil'
+    import { createIndexedDB, saveDataLocally, getLocalData, DB_NAME_TYPE, STORE_NAME_TYPE} from 'assets/js/idbUtil'
     import { createNamespacedHelpers } from 'vuex'
     const {  mapMutations } = createNamespacedHelpers('newProj')
 
@@ -44,9 +44,9 @@
         async created(){
 
             const vm = this;
-            const dbPromise = await createIndexedDB('types-db', 'types');
+            const dbPromise = await createIndexedDB(DB_NAME_TYPE, STORE_NAME_TYPE);
 
-            vm.typeList = await getLocalData(dbPromise, 'types');
+            vm.typeList = await getLocalData(dbPromise, STORE_NAME_TYPE);
 
             console.log('typeList', vm.typeList);
 

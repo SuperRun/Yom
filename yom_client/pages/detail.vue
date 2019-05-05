@@ -122,7 +122,7 @@
 
 <script>
     import axios from '~/plugins/axios'
-    import { createIndexedDB, saveDataLocally, getLocalData, setLastUpdated } from 'assets/js/idbUtil'
+    import { createIndexedDB, saveDataLocally, getLocalData, DB_NAME_CATCONFIG, STORE_NAME_CATCONFIG } from 'assets/js/idbUtil'
     import { createNamespacedHelpers } from 'vuex'
     import { copyList } from 'assets/js/util'
     const { mapMutations, mapGetters } = createNamespacedHelpers('newProj')
@@ -192,14 +192,14 @@
 
                 let CURRENT_VERSION = await vm.getDbVersion() || 1;
 
-                let dbPromise = await createIndexedDB('configcats-db', `configcats-${vm.type}`, CURRENT_VERSION);
+                let dbPromise = await createIndexedDB(DB_NAME_CATCONFIG, `${DB_NAME_CATCONFIG}-${vm.type}`, CURRENT_VERSION);
 
-                if(!dbPromise.objectStoreNames.contains(`configcats-${vm.type}`)){
+                if(!dbPromise.objectStoreNames.contains(`${DB_NAME_CATCONFIG}-${vm.type}`)){
                     dbPromise.close();
-                    dbPromise = await createIndexedDB('configcats-db', `configcats-${vm.type}`, CURRENT_VERSION + 1);
+                    dbPromise = await createIndexedDB(DB_NAME_CATCONFIG, `${DB_NAME_CATCONFIG}-${vm.type}`, CURRENT_VERSION + 1);
                 }
 
-                const configcats = await getLocalData(dbPromise, `configcats-${vm.type}`);
+                const configcats = await getLocalData(dbPromise, `${DB_NAME_CATCONFIG}-${vm.type}`);
                 vm.setCatList(configcats);
                 vm.convertToCatTree(vm.catList);
 
@@ -208,7 +208,7 @@
                         console.log('data changed');
                         vm.setCatList(data);
                         vm.convertToCatTree(vm.catList);
-                        await saveDataLocally(dbPromise, `configcats-${vm.type}`, data);
+                        await saveDataLocally(dbPromise, `${DB_NAME_CATCONFIG}-${vm.type}`, data);
                     }
                 }).catch(async err => {
                     console.log('Network requests have failed, this is expected if offline');
@@ -337,7 +337,7 @@
             async getDbVersion(){
                 const databases = await window.indexedDB.databases();
                 for (let db of databases) {
-                    if (db.name === 'configcats-db') {
+                    if (db.name === DB_NAME_CATCONFIG) {
                         return db.version;
                     }
                 } 

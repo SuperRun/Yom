@@ -41,35 +41,28 @@ if (workbox) {
         console.log('Service Worker 状态： activate');
     });
 
-
-
     const bgSyncPluginForCreate = new workbox.backgroundSync.Plugin('projects-create-queue', {
-        callbacks: {
-            requestWillEnqueue: (storableRequest) => {
-                console.log('requestWillEnqueue')
-            },
-            requestWillReplay: (storableRequest) => {
-                console.log('requestWillReplay')
-            },
-            queueDidReplay: (storableRequest) => {
-                console.log('queueDidReplay')
+        onSync: async ({queue}) => {
+            let savedProjId = [];
+            let entry;
+            while (entry = await queue.shiftRequest()) {
+                const markId = entry.request.headers.get('X-Mark-Id');
+                try {
+                    if (savedProjId.indexOf(markId) ===-1){
+                        console.log('fetch the first time');
+                        savedProjId.push(markId);
+                        await fetch(entry.request);
+                    }
+                } catch (error) {
+                    console.error('Replay failed for request', entry.request, error);
+                    await this.unshiftRequest(entry);
+                    return;
+                }
             }
         }
     });
 
-    const bgSyncPluginForUpdate = new workbox.backgroundSync.Plugin('projects-update-queue', {
-        callbacks: {
-            requestWillEnqueue: (storableRequest) => {
-                console.log('requestWillEnqueue')
-            },
-            requestWillReplay: (storableRequest) => {
-                console.log('requestWillReplay')
-            },
-            queueDidReplay: (storableRequest) => {
-                console.log('queueDidReplay')
-            }
-        }
-    });
+    const bgSyncPluginForUpdate = new workbox.backgroundSync.Plugin('projects-update-queue');
 
     const networkWithBackgroundSyncForCreate = new workbox.strategies.NetworkOnly({
         plugins: [bgSyncPluginForCreate],
@@ -97,12 +90,8 @@ if (workbox) {
         'PUT'
     );
 
-    self.addEventListener('sync', function (e) {
-        console.log('sync', e);
-    });
-
     workbox.routing.registerRoute(new RegExp('/_nuxt/(?!.*(__webpack_hmr|hot-update))'), new workbox.strategies.CacheFirst ({}), 'GET')
-    workbox.routing.registerRoute(new RegExp('/(?!.*(__webpack_hmr|hot-update))'), new workbox.strategies.CacheFirst ({}), 'GET')
+    workbox.routing.registerRoute(new RegExp('/(?!.*(__webpack_hmr|hot-update))'), new workbox.strategies.NetworkFirst ({}), 'GET')
 
 } else {
     console.log(`Boo! Workbox didn't load 😬`);

@@ -1,5 +1,13 @@
 import {openDB} from "idb";
 
+const DB_NAME_TYPE = "types-db";
+const DB_NAME_CATCONFIG = "configcats-db";
+const DB_NAME_PROJ = "projects-db";
+
+const STORE_NAME_TYPE = "types";
+const STORE_NAME_CATCONFIG = "configcats";
+const STORE_NAME_PROJ = "projects";
+
 async function createIndexedDB(dbName, storeName, version=1, ...indexs) {
     if (!('indexedDB' in window)) {
         return null;
@@ -55,8 +63,11 @@ async function addDataLocally(db, storeName, data) {
     return dataKey;
 }
 
-function fetchApi(url , method, data) {
-    const headers = new Headers({'Content-Type': 'application/json'});
+function fetchApi(url , method, data, markId = '') {
+    console.log('markId', markId);
+    const headers = new Headers(
+        {'Content-Type': 'application/json', 'X-Mark-Id': markId}
+    );
     const body = JSON.stringify(data);
     return fetch(url, {
         method: method,
@@ -143,5 +154,11 @@ export {
     getLastUpdated,
     addDataLocally,
     fetchApi,
-    updateProj
+    updateProj,
+    DB_NAME_TYPE,
+    DB_NAME_CATCONFIG,
+    DB_NAME_PROJ,
+    STORE_NAME_TYPE,
+    STORE_NAME_CATCONFIG,
+    STORE_NAME_PROJ
 }

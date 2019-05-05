@@ -66,17 +66,20 @@ export default {
   */
   workbox: {
       swURL: 'custom-sw.js'
-      // runtimeCaching:[{
-      //     urlPattern: new RegExp('http://localhost:1337/projects'),
-      //     handler: 'networkOnly',
-      //     method: 'POST',
-      //     strategyOptions: {
-      //         //background sync. conf
-      //         plugins: [{
-      //             name: 'backgroundSync',
-      //         }]
+      // runtimeCaching:[
+      //     {
+      //         urlPattern: 'http://localhost:1337/projects',
+      //         handler: 'networkOnly',
+      //         method: 'POST',
+      //         strategyOptions: {
+      //             plugins:[{
+      //                 fetchDidFail: async ({originalRequest, request, error, event}) => {
+      //                     console.log(originalRequest)
+      //                 }
+      //             }]
+      //         }
       //     }
-      // }]
+      // ]
   },
 
   /*

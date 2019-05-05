@@ -41,7 +41,7 @@
     import Vue from 'vue'
     import EasyRefresh from 'vue-easyrefresh'
     Vue.use(EasyRefresh);
-    import { createIndexedDB, saveDataLocally, setLastUpdated, searchProjs, getProjsByDate } from 'assets/js/idbUtil'
+    import { createIndexedDB, saveDataLocally, setLastUpdated, searchProjs, getProjsByDate, STORE_NAME_PROJ, DB_NAME_PROJ } from 'assets/js/idbUtil'
     import { createNamespacedHelpers } from 'vuex'
     import { copyList } from 'assets/js/util'
     const { mapMutations, mapGetters } = createNamespacedHelpers('newProj');
@@ -89,10 +89,10 @@
             const vm = this;
             await vm.getProjects().then(async (data) => {
 
-                const dbPromise = await createIndexedDB('projects-db', 'projects',1,['date']);
+                const dbPromise = await createIndexedDB(DB_NAME_PROJ, STORE_NAME_PROJ,1,['date']);
                 vm.$store.commit('indexedDB/setProjects',vm.moreProjects);
 
-                await saveDataLocally(dbPromise, 'projects', vm.projects)
+                await saveDataLocally(dbPromise, STORE_NAME_PROJ, vm.projects)
                     .then(()=>(setLastUpdated(new Date())))
                     .catch(err=>(console.log(`Save Data Error: ${err}`)));
 
@@ -103,18 +103,17 @@
                 const query = { endTime, projName, startTime };
 
                 console.log('Network requests have failed, this is expected if offline');
-                const dbPromise = await createIndexedDB('projects-db', 'projects',1);
+                const dbPromise = await createIndexedDB(DB_NAME_PROJ, STORE_NAME_PROJ,1);
                 let projects = [];
                 if (!Object.keys(this.$route.query).length){
                     projects = await getProjsByDate(dbPromise);
                     projects.reverse();
-                    console.log(projects);
                 } else {
                     const { endTime, projName, startTime } = this.$route.query;
                     const query = { endTime, projName, startTime };
                     projects = await searchProjs(dbPromise, query);
-
                 }
+                console.log(projects);
                 vm.$store.commit('indexedDB/setProjects', projects);
                 dbPromise.close();
             });
@@ -165,8 +164,8 @@
                     await this.getProjects();
                     this.$store.commit('indexedDB/loadProjects', this.moreProjects);
                     // this.projects = this.projects.concat(this.moreProjects);
-                    const dbPromise = await createIndexedDB('projects-db', 'projects');
-                    await saveDataLocally(dbPromise, 'projects', this.projects)
+                    const dbPromise = await createIndexedDB(DB_NAME_PROJ, STORE_NAME_PROJ);
+                    await saveDataLocally(dbPromise, STORE_NAME_PROJ, this.projects)
                         .then(()=>(setLastUpdated(new Date())))
                         .catch(err=>(console.log(`Save Data Error: ${err}`)));
                     dbPromise.close();
@@ -203,6 +202,7 @@
                         user: this.$store.state.auth.id,
                         created_at_lte: endTime,
                         created_at_gte: startTime,
+
                         projName_contains: projName
                     }
                 }).then((res)=>{

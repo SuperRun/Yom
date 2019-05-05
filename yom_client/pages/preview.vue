@@ -161,7 +161,7 @@
 
 <script>
     import { createNamespacedHelpers } from 'vuex'
-    import { createIndexedDB, getLocalData, addDataLocally, fetchApi, updateProj } from 'assets/js/idbUtil'
+    import { createIndexedDB, addDataLocally, fetchApi, updateProj, DB_NAME_PROJ, STORE_NAME_PROJ } from 'assets/js/idbUtil'
     import { getNowFormatDate } from 'assets/js/util'
     import axios from '~/plugins/axios'
     const { mapGetters, mapMutations } = createNamespacedHelpers('newProj')
@@ -236,25 +236,32 @@
             },
             async saveOrUpdate(){
                 if (this.id){
-                    this.updateProject();
+                    await this.updateProject();
                 } else {
                     await this.saveProject();
                 }
             },
             async saveProject() {
-                const {projNameShare, descriptionShare} = this;
+                const { projNameShare, descriptionShare, timeTotal, projtype } = this;
                 const vm = this;
-                vm.tipDialog = false;
-                vm.savingDialog = true;
                 const newProj = {
                     projName: projNameShare,
                     description: descriptionShare,
-                    timeTotal: vm.timeTotal,
-                    user: vm.$store.state.auth.id,
-                    projtype: vm.projtype,
-                    projhistorycats: vm.createProjHistoryCats()
+                    timeTotal: timeTotal,
+                    projtype: projtype,
+                    projhistorycats: vm.createProjHistoryCats(),
+                    created_at: getNowFormatDate(),
+                    user: vm.$store.state.auth.id
                 }
-                await fetchApi('http://localhost:1337/projects', 'POST', newProj).then(res => {
+
+                vm.tipDialog = false;
+                vm.savingDialog = true;
+
+                const dbPromise = await createIndexedDB(DB_NAME_PROJ, STORE_NAME_PROJ);
+                const projId = await addDataLocally(dbPromise, STORE_NAME_PROJ, newProj);
+                dbPromise.close();
+
+                await fetchApi('http://localhost:1337/projects', 'POST', newProj, projId).then(res => {
                     console.log(res);
                     if (res.ok) {
                         setTimeout(() => {
@@ -264,48 +271,8 @@
                         }, 1000);
                     }
                 }).catch(async err => {
-                    const STORE_NAME = 'projects';
-                    const DB_NAME = 'projects-db';
 
-                    // if ('serviceWorker' in navigator && 'SyncManager' in window) {
-                    //
-                    //     navigator.serviceWorker.ready.then(async(registration) => {
-                    //         const dbPromise = await createIndexedDB(DB_NAME, STORE_NAME);
-                    //         Object.assign(newProj,{
-                    //             created_at: getNowFormatDate()
-                    //         });
-                    //         const key = await addDataLocally(dbPromise, STORE_NAME, newProj);
-                    //         const tag = {
-                    //             name: 'projects_create_sync',
-                    //             request: new Request('http://localhost:1337/projects',{
-                    //                 method: 'POST',
-                    //                 body: newProj
-                    //             })
-                    //         };
-                    //         registration.sync.register(tag).then( async ()=> {
-                    //             console.log('后台同步已触发', tag);
-                    //         }).catch(function (err) {
-                    //             console.log('后台同步触发失败', err);
-                    //         });
-                    //     });
-                    // }
-
-                    if ('serviceWorker' in navigator) {
-                        navigator.serviceWorker.getRegistrations().then((registrations) => {
-                            for (const worker of registrations) {
-                                console.log('Service worker:', worker);
-                                worker.sync.register('tag').then( async ()=> {
-                                    console.log('后台同步已触发', 'tag');
-                                }).catch(function (err) {
-                                    console.log('后台同步触发失败', err);
-                                });
-                            }
-
-                        });
-                    }
-
-
-                    console.log(`save a project failed:${err}`);
+                    console.log(`Save a project failed:${err}`);
 
                     setTimeout(() => {
                         vm.savingDialog = false;
@@ -316,33 +283,53 @@
                 });
             },
             async updateProject () {
-                const {projNameShare, descriptionShare} = this;
+
+                this.updateCatList();
+
                 const vm = this;
-                vm.tipDialog = false;
-                vm.savingDialog = true;
-                await axios.put('/projects/'+this.id, {
+                const { projNameShare, descriptionShare, timeTotal, catList, id, projtype } = this;
+                const editProj = {
                     projName: projNameShare,
                     description: descriptionShare,
-                    user: this.$store.state.auth.id,
-                    timeTotal: this.timeTotal
+                    timeTotal: timeTotal,
+                    projtype: projtype,
+                    projhistorycats: catList,
+                    user: this.$store.state.auth.id
+                };
+                const dbPromise = await createIndexedDB(DB_NAME_PROJ, STORE_NAME_PROJ, 1);
+                await updateProj(dbPromise, id, editProj);
+                dbPromise.close();
+
+                this.tipDialog = false;
+                this.savingDialog = true;
+
+                // The project not be saved in database due to offline
+                if (!catList[0].id){
+                    await fetchApi('http://localhost:1337/projects', 'POST', editProj, id).catch(async err => {
+
+                        console.log(`Update a project failed:${err}`);
+
+                        setTimeout(() => {
+                            vm.savingDialog = false;
+                            vm.isOffline = true;
+                            vm.initData();
+                            vm.$router.replace('/project');
+                        }, 1000);
+                    });
+
+                    return;
+                }
+
+                await axios.put('/projects/'+ id, {
+                    projName: projNameShare,
+                    description: descriptionShare,
+                    timeTotal: timeTotal,
+                    user: this.$store.state.auth.id
                 }).then((res) => {
                     console.log(res);
                     vm.updateProjHistoryCats();
                 }).catch(async err=>{
                     console.log(`update a project failed:${err}`);
-                    // update the data in indexeddb
-                    vm.updateCatList();
-                    const editProj = {
-                        projName: projNameShare,
-                        description: descriptionShare,
-                        timeTotal: this.timeTotal,
-                        user: this.$store.state.auth.id,
-                        projtype: this.projtype,
-                        projhistorycats: this.catList
-                    };
-                    const dbPromise = await createIndexedDB('projects-db', 'projects', 1);
-                    await updateProj(dbPromise, this.id, editProj);
-                    dbPromise.close();
 
                     setTimeout(() => {
                         vm.savingDialog = false;
