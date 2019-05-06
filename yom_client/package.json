@@ -17,7 +17,7 @@
     "cross-env": "^5.2.0",
     "idb": "^4.0.3",
     "js-cookie": "^2.2.0",
-    "nuxt": "^2.6.3",
+    "nuxt": "^2.4.0",
     "strapi-sdk-javascript": "^0.3.1",
     "vue-easyrefresh": "^1.0.4",
     "vuetify": "^1.5.5",
