@@ -4,12 +4,12 @@
   "description": "My divine Nuxt.js project",
   "author": "SuperRun",
   "private": true,
-  "scripts": {
-    "dev": "nuxt",
-    "build": "nuxt build",
-    "start": "nuxt start",
-    "generate": "nuxt generate"
-  },
+"scripts": {
+  "dev": "nuxt",
+  "build": "nuxt build",
+  "start": "nuxt start",
+  "heroku-postbuild": "npm run build"
+},
   "dependencies": {
     "@nuxtjs/pwa": "^3.0.0-beta.14",
     "axios": "^0.18.0",
