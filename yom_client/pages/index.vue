@@ -66,6 +66,7 @@ import VuetifyLogo from '~/components/VuetifyLogo.vue'
 
 export default {
   layout: 'common',
+  middleware: 'authenticated',
   components: {
     Logo,
     VuetifyLogo
