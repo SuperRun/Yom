@@ -1,75 +1,119 @@
+
 <template>
-  <v-layout
-    column
-    justify-center
-    align-center
-  >
-    <v-flex
-      xs12
-      sm8
-      md6
-    >
-      <div class="text-xs-center">
-        <logo />
-        <vuetify-logo />
+  <div id="main">
+    <v-layout column justify-space-between id="container">
+      <v-layout mt-5></v-layout>
+      <div align="center">
+        <v-flex xs12>  <v-img src="/login/logo.png" width="50%" ></v-img></v-flex>
       </div>
-      <v-card>
-        <v-card-title class="headline">Welcome to the Vuetify + Nuxt.js template</v-card-title>
-        <v-card-text>
-          <p>Vuetify is a progressive Material Design component framework for Vue.js. It was designed to empower developers to create amazing applications.</p>
-          <p>For more information on Vuetify, check out the <a
-            href="https://vuetifyjs.com"
-            target="_blank"
-          >documentation</a>.</p>
-          <p>If you have questions, please join the official <a
-            href="https://chat.vuetifyjs.com/"
-            target="_blank"
-            title="chat"
-          >discord</a>.</p>
-          <p>Find a bug? Report it on the github <a
-            href="https://github.com/vuetifyjs/vuetify/issues"
-            target="_blank"
-            title="contribute"
-          >issue board</a>.</p>
-          <p>Thank you for developing with Vuetify and I look forward to bringing more exciting features in the future.</p>
-          <div class="text-xs-right">
-            <em><small>&mdash; John Leider</small></em>
-          </div>
-          <hr class="my-3">
-          <a
-            href="https://nuxtjs.org/"
-            target="_blank"
-          >Nuxt Documentation</a>
-          <br>
-          <a
-            href="https://github.com/nuxt/nuxt.js"
-            target="_blank"
-          >Nuxt GitHub</a>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer />
-          <v-btn
-            color="primary"
-            flat
-            nuxt
-            to="/inspire"
-          >Continue</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-flex>
-  </v-layout>
+      <v-flex xs12>
+        <v-layout column
+                  align-center
+                  justify-center
+                  mt-5
+        >
+          <v-flex xs12>
+            <v-form>
+              <span v-if="loading== false" style="color:red">{{ message }}</span>
+
+              <v-text-field class="mx-auto white--text"
+                            background-color="rgba(255,250,250,0.5)"
+                            label="USERNAME/EMAIL"
+                            solo
+                            v-model="email"
+                            required
+              ></v-text-field>
+              <v-text-field
+                v-model="password"
+                background-color="rgba(255,250,250,0.5)"
+                label="PASSWORD"
+                required
+                solo
+                :append-icon="show1 ? 'visibility' : 'visibility_off'"
+                :type="show1 ? 'text' : 'password'"
+                @click:append="show1 = !show1"
+              ></v-text-field>
+
+              <v-layout column
+                        align-center
+                        justify-center
+              >
+                <v-btn  color="#3d4047" class="white--text btn-width" @click="loginClick">login</v-btn>
+              </v-layout>
+            </v-form>
+          </v-flex>
+        </v-layout>
+      </v-flex>
+    </v-layout>
+  </div>
+
 </template>
 
 <script>
-import Logo from '~/components/Logo.vue'
-import VuetifyLogo from '~/components/VuetifyLogo.vue'
+  const Cookie = process.client ? require('js-cookie') : undefined
+  import Strapi from 'strapi-sdk-javascript/build/main'
+  const apiUrl =  'https://strapiserver.herokuapp.com/'
+  const strapi = new Strapi(apiUrl)
 
-export default {
-  layout: 'common',
-  middleware: 'authenticated',
-  components: {
-    Logo,
-    VuetifyLogo
+
+  export default {
+    middleware: 'notAuthenticated',
+    data() {
+      return {
+        show1: false,
+        show2: true,
+        email:'',
+        password: '',
+        loading: true,
+        message:''
+      }
+    },
+    methods:{
+      async loginClick(){
+        try {
+          console.log("login Click")
+          this.loading = true
+
+          const response = await strapi.login(this.email, this.password);
+          const auth = {
+            accessToken: 'response.jwt'
+          };
+          const id = response.user.id;
+          this.$store.commit('auth/setAuth', auth);// mutating to store for client rendering
+          this.$store.commit('auth/setId', id);// mutating to store for client rendering
+          Cookie.set('auth', auth); // saving token in cookie for server rendering
+
+          console.log(this.$store.state.auth.id);
+          console.log(id),
+          this.$router.push(`/userStart`)
+        } catch (err) {
+          this.loading = false;
+          this.message = err.message;
+/*
+          alert(err.message || 'An error occurred.')
+*/
+        }
+      }
+    }
   }
-}
 </script>
+<style>
+  #main{
+    width: 100%;
+    height: 100%;
+    background-image: url("/login/login.jpg");
+    background-size: cover;
+    flex-direction:column;
+    justify-content: space-between;
+  }
+  #container{
+    width: 100%;
+    height: 100%;
+  }
+  .flex-width{
+    width: 60%;
+  }
+  .btn-width{
+    width: 100%;
+  }
+</style>
