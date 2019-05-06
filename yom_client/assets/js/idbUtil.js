@@ -8,35 +8,38 @@ const STORE_NAME_TYPE = "types";
 const STORE_NAME_CATCONFIG = "configcats";
 const STORE_NAME_PROJ = "projects";
 
-async function createIndexedDB(dbName, storeName, version=1, ...indexs) {
-    if (!('indexedDB' in window)) {
-        return null;
-    }
-    return await openDB(dbName, version, {
-        upgrade(db) {
-
-            console.log(`version=${version}`);
-
-            console.log(`storeName=${storeName}`);
-
-            if (!db.objectStoreNames.contains(storeName)) {
-
-                const store = db.createObjectStore(storeName, {
-                    keyPath: 'id',
-                    autoIncrement: true
-
-                });
-
-                if (storeName == 'projects') {
-                    console.log('create a index');
-                    store.createIndex('createdAtIndex', 'created_at', {unique: false});
-                    store.createIndex('projNameIndex', 'projName', {unique: false});
-                }
-            }
-
-
+async function createIndexedDB(dbName, storeName, version=1) {
+    if (process.client) {
+        if (!('indexedDB' in window)) {
+            return null;
         }
-    });
+        return await openDB(dbName, version, {
+            upgrade(db) {
+
+                console.log(`version=${version}`);
+
+                console.log(`storeName=${storeName}`);
+
+                if (!db.objectStoreNames.contains(storeName)) {
+
+                    const store = db.createObjectStore(storeName, {
+                        keyPath: 'id',
+                        autoIncrement: true
+
+                    });
+
+                    if (storeName == 'projects') {
+                        console.log('create a index');
+                        store.createIndex('createdAtIndex', 'created_at', {unique: false});
+                        store.createIndex('projNameIndex', 'projName', {unique: false});
+                    }
+                }
+
+
+            }
+        });
+    }
+
 }
 
 async function saveDataLocally(db, storeName, datas) {
@@ -151,7 +154,6 @@ export {
     getProjsByDate,
     searchProjs,
     setLastUpdated,
-    getLastUpdated,
     addDataLocally,
     fetchApi,
     updateProj,

@@ -1,8 +1,6 @@
 import VuetifyLoaderPlugin from 'vuetify-loader/lib/plugin'
 import pkg from './package'
-const workbox = async () => {
-    return await window.$workbox
-};
+
 export default {
   mode: 'universal',
 
@@ -44,7 +42,16 @@ export default {
   */
   plugins: [
     '@/plugins/vuetify',
-    '@/plugins/axios'
+    '@/plugins/axios',
+    {
+        src: '~/plugins/sw.js',
+        ssr: false
+    },
+    {
+        src: '~/plugins/easyRefresh.js',
+        ssr: false
+    }
+
   ],
 
   /*
@@ -102,5 +109,4 @@ export default {
   env: {
     baseUrl: process.env.BASE_URL || 'http://localhost:1337'
   }
-
 }

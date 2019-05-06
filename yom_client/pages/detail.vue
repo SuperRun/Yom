@@ -1,7 +1,6 @@
 
 <template>
     <v-container
-            fluid
             grid-list-lg
     >
 
@@ -34,13 +33,15 @@
                             <v-flex xs12
                                     v-for="(child,j) in cat.childNodes"
                                     :key="j">
+
                                 <v-layout row>
                                     <v-flex xs10 class="checkboxMargin">
                                         <v-checkbox v-model="selectedCats"
                                                     :label="`${child.category ? child.category.catName : child.catName}`"
                                                     :value="child.category ? child.category.id : (child.id?child.id:child.catId)"
                                                     hide-details
-                                                    class="checkboxHeight"></v-checkbox>
+                                                    class="checkboxHeight"
+                                                    ></v-checkbox>
                                     </v-flex>
                                     <v-flex xs2>
                                         <div class="timeCost"
@@ -49,7 +50,6 @@
                                         </div>
                                     </v-flex>
                                 </v-layout>
-
                             </v-flex>
                         </v-layout>
 
@@ -164,8 +164,6 @@
             ])
         },
         async created () {
-
-            console.log('it is detail page');
 
             const vm = this;
 
@@ -335,12 +333,15 @@
                 })
             },
             async getDbVersion(){
-                const databases = await window.indexedDB.databases();
-                for (let db of databases) {
-                    if (db.name === DB_NAME_CATCONFIG) {
-                        return db.version;
+                if (process.client) {
+                    const databases = await window.indexedDB.databases();
+                    for (let db of databases) {
+                        if (db.name === DB_NAME_CATCONFIG) {
+                            return db.version;
+                        }
                     }
-                } 
+                }
+
             }
         }
     }
@@ -352,7 +353,6 @@
         margin-top: 0 !important;
     }
     .checkboxHeight{
-        /*height: 20px;*/
         padding: 0 !important;
     }
     .btn{

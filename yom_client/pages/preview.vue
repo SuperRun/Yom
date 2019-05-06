@@ -149,7 +149,7 @@
                     <v-btn
                             color="green darken-1"
                             flat="flat"
-                            @click="isOffline=true">
+                            @click="isOffline=false">
                         OK
                     </v-btn>
                 </v-card-actions>
@@ -261,22 +261,21 @@
                 const projId = await addDataLocally(dbPromise, STORE_NAME_PROJ, newProj);
                 dbPromise.close();
 
-                await fetchApi('http://localhost:1337/projects', 'POST', newProj, projId).then(res => {
-                    console.log(res);
-                    if (res.ok) {
-                        setTimeout(() => {
-                            vm.savingDialog = false;
-                            vm.initData();
-                            vm.$router.replace('/project');
-                        }, 1000);
+                await axios({
+                    method: 'post',
+                    url: '/projects',
+                    data: newProj,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Mark-Id': projId
                     }
+                }).then(res=>{
+                    console.log(`Save a project succeed:${res}`);
                 }).catch(async err => {
-
                     console.log(`Save a project failed:${err}`);
-
+                }).finally(()=>{
                     setTimeout(() => {
                         vm.savingDialog = false;
-                        vm.isOffline = true;
                         vm.initData();
                         vm.$router.replace('/project');
                     }, 1000);
@@ -305,13 +304,22 @@
 
                 // The project not be saved in database due to offline
                 if (!catList[0].id){
-                    await fetchApi('http://localhost:1337/projects', 'POST', editProj, id).catch(async err => {
 
-                        console.log(`Update a project failed:${err}`);
-
+                    await axios({
+                        method: 'post',
+                        url: '/projects',
+                        data: editProj,
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-Mark-Id': id
+                        }
+                    }).then(res=>{
+                        console.log(`Save a project succeed:${res}`);
+                    }).catch(async err => {
+                        console.log(`Save a project failed:${err}`);
+                    }).finally(()=>{
                         setTimeout(() => {
                             vm.savingDialog = false;
-                            vm.isOffline = true;
                             vm.initData();
                             vm.$router.replace('/project');
                         }, 1000);

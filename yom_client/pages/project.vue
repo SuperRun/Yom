@@ -38,9 +38,6 @@
 
 <script>
     import axios from '~/plugins/axios'
-    import Vue from 'vue'
-    import EasyRefresh from 'vue-easyrefresh'
-    Vue.use(EasyRefresh);
     import { createIndexedDB, saveDataLocally, setLastUpdated, searchProjs, getProjsByDate, STORE_NAME_PROJ, DB_NAME_PROJ } from 'assets/js/idbUtil'
     import { createNamespacedHelpers } from 'vuex'
     import { copyList } from 'assets/js/util'

@@ -8,7 +8,6 @@
                     <v-card-title primary-title>
                         <div>
                             <div class="headline">{{type.typeName}}</div>
-                            <!--<span>Listen to your favorite artists and albums whenever and wherever, online and offline.</span>-->
                         </div>
                     </v-card-title>
                     <v-card-actions>
