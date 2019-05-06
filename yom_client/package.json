@@ -4,12 +4,12 @@
   "description": "My divine Nuxt.js project",
   "author": "SuperRun",
   "private": true,
-"scripts": {
-  "dev": "nuxt",
-  "build": "nuxt build",
-  "start": "nuxt start",
-  "heroku-postbuild": "npm run build"
-},
+  "scripts": {
+    "dev": "nuxt",
+    "build": "nuxt build",
+    "start": "nuxt start",
+    "generate": "nuxt generate"
+  },
   "dependencies": {
     "@nuxtjs/pwa": "^3.0.0-beta.14",
     "axios": "^0.18.0",
@@ -17,7 +17,7 @@
     "cross-env": "^5.2.0",
     "idb": "^4.0.3",
     "js-cookie": "^2.2.0",
-    "nuxt": "^2.4.0",
+    "nuxt": "^2.6.3",
     "strapi-sdk-javascript": "^0.3.1",
     "vue-easyrefresh": "^1.0.4",
     "vuetify": "^1.5.5",
