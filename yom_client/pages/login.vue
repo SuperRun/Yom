@@ -52,7 +52,7 @@
 <script>
   const Cookie = process.client ? require('js-cookie') : undefined
   import Strapi from 'strapi-sdk-javascript/build/main'
-  const apiUrl = process.env.API_URL || 'http://localhost:1337'
+  const apiUrl = process.evn.BASE_URL
   const strapi = new Strapi(apiUrl)
 
 
