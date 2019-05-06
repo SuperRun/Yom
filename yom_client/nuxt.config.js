@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import VuetifyLoaderPlugin from 'vuetify-loader/lib/plugin'
 import pkg from './package'
 
