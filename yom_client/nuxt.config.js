@@ -44,7 +44,7 @@ export default {
     '@/plugins/vuetify',
     '@/plugins/axios',
     {
-        src: '~/plugins/sw.js',
+        src: '~/plugins/regist-sw.js',
         ssr: false
     },
     {
@@ -107,6 +107,6 @@ export default {
     }
   },
   env: {
-    baseUrl: process.env.BASE_URL || 'http://localhost:1337'
+    baseUrl: process.env.BASE_URL || 'https://strapiserver.herokuapp.com'
   }
 }

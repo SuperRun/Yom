@@ -102,7 +102,7 @@
 
     export default {
         name: "search",
-        middleware: 'authenticated',
+        // middleware: 'authenticated',
         layout: "common",
         data: ()=>{
             return {

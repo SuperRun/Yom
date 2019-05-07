@@ -161,7 +161,7 @@
 
 <script>
     import { createNamespacedHelpers } from 'vuex'
-    import { createIndexedDB, addDataLocally, fetchApi, updateProj, DB_NAME_PROJ, STORE_NAME_PROJ } from 'assets/js/idbUtil'
+    import { createIndexedDB, addDataLocally, updateProj, DB_NAME_PROJ, STORE_NAME_PROJ } from 'assets/js/idbUtil'
     import { getNowFormatDate } from 'assets/js/util'
     import axios from '~/plugins/axios'
     const { mapGetters, mapMutations } = createNamespacedHelpers('newProj')
@@ -169,7 +169,7 @@
     export default {
         name: "preview",
         layout: 'common',
-        middleware: 'authenticated',
+        // middleware: 'authenticated',
         data(){
             return {
                 tipDialog: false,
@@ -335,7 +335,6 @@
                     user: this.$store.state.auth.id
                 }).then((res) => {
                     console.log(res);
-                    vm.updateProjHistoryCats();
                 }).catch(async err=>{
                     console.log(`update a project failed:${err}`);
 
@@ -345,6 +344,9 @@
                         vm.initData();
                         vm.$router.replace('/project');
                     }, 1000);
+
+                }).finally(async ()=>{
+                    await vm.updateProjHistoryCats();
                 });
             },
             async updateProjHistoryCats() {

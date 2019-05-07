@@ -40,13 +40,12 @@
     import axios from '~/plugins/axios'
     import { createIndexedDB, saveDataLocally, setLastUpdated, searchProjs, getProjsByDate, STORE_NAME_PROJ, DB_NAME_PROJ } from 'assets/js/idbUtil'
     import { createNamespacedHelpers } from 'vuex'
-    import { copyList } from 'assets/js/util'
     const { mapMutations, mapGetters } = createNamespacedHelpers('newProj');
 
     export default {
         name: "project",
         layout: "common",
-        middleware: 'authenticated',
+        // middleware: 'authenticated',
         data(){
             return {
                 itemColor:[

@@ -1,4 +1,4 @@
-import {copyList} from "../../assets/js/util";
+import {copyList} from "assets/js/util";
 
 const state = () => ({
     projNameShare: "",

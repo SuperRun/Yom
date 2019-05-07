@@ -43,6 +43,7 @@ async function createIndexedDB(dbName, storeName, version=1) {
 }
 
 async function saveDataLocally(db, storeName, datas) {
+
     if (!('indexedDB' in window)) {return null;}
     // console.log(db);
     const tx = db.transaction(storeName, 'readwrite');
@@ -55,15 +56,18 @@ async function saveDataLocally(db, storeName, datas) {
 }
 
 async function addDataLocally(db, storeName, data) {
-    if (!('indexedDB' in window)) {return null;}
-    // console.log(db);
-    const tx = db.transaction(storeName, 'readwrite');
-    let dataKey = null;
-    tx.store.add(data).then(res=>{
-        dataKey = res;
-    });
-    await tx.done;
-    return dataKey;
+    if (process.client) {
+        if (!('indexedDB' in window)) {return null;}
+        // console.log(db);
+        const tx = db.transaction(storeName, 'readwrite');
+        let dataKey = null;
+        tx.store.add(data).then(res=>{
+            dataKey = res;
+        });
+        await tx.done;
+        return dataKey;
+    }
+
 }
 
 function fetchApi(url , method, data, markId = '') {
@@ -111,7 +115,7 @@ async function updateProj(db, id, proj){
 }
 
 async function getProjsByDate(db){
-    return await db.getAllFromIndex('projects', 'createdAtIndex');
+   return await db.getAllFromIndex('projects', 'createdAtIndex');
 }
 
 async function searchProjs(db, query){
@@ -155,7 +159,6 @@ export {
     searchProjs,
     setLastUpdated,
     addDataLocally,
-    fetchApi,
     updateProj,
     DB_NAME_TYPE,
     DB_NAME_CATCONFIG,

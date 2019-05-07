@@ -45,6 +45,7 @@ if (workbox) {
         onSync: async ({queue}) => {
             let savedProjId = [];
             let entry;
+            console.log('background sync');
             while (entry = await queue.shiftRequest()) {
                 const markId = entry.request.headers.get('X-Mark-Id');
                 try {
@@ -72,23 +73,27 @@ if (workbox) {
         plugins: [bgSyncPluginForUpdate],
     });
 
+    const baseUrl = 'https://strapiserver.herokuapp.com';
+
+    console.log(baseUrl);
+
     workbox.routing.registerRoute(
-        /http:\/\/localhost:1337\/projects/,
+        new RegExp(`${baseUrl}/projects`),
         networkWithBackgroundSyncForCreate,
         'POST'
     );
 
     workbox.routing.registerRoute(
-        /http:\/\/localhost:1337\/projects\/*/,
+        new RegExp(`${baseUrl}/(projects|projhistorycats)`),
         networkWithBackgroundSyncForUpdate,
         'PUT'
     );
 
-    workbox.routing.registerRoute(
-        /http:\/\/localhost:1337\/projhistorycats/,
-        networkWithBackgroundSyncForUpdate,
-        'PUT'
-    );
+    // workbox.routing.registerRoute(
+    //     /http:\/\/localhost:1337\/projhistorycats/,
+    //     networkWithBackgroundSyncForUpdate,
+    //     'PUT'
+    // );
 
     workbox.routing.registerRoute(new RegExp('/_nuxt/(?!.*(__webpack_hmr|hot-update))'), new workbox.strategies.CacheFirst ({}), 'GET')
     workbox.routing.registerRoute(new RegExp('/(?!.*(__webpack_hmr|hot-update))'), new workbox.strategies.NetworkFirst ({}), 'GET')
