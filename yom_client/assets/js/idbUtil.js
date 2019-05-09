@@ -86,6 +86,15 @@ function fetchApi(url , method, data, markId = '') {
 async function getLocalData(db, storeName) {
     return await db.getAll(storeName);
 }
+async function getLocalDataCount(db, storeName) {
+    return await db.count(storeName);
+}
+// async function getLocalDataCount(db, storeName) {
+//     return await db.getAll(storeName).then(res =>{
+//         console.log(`getLocalDataCount res=${res.length}`);
+//         return res.length;
+//     });
+// }
 
 async function updateProj(db, id, proj){
     const tx = db.transaction('projects','readwrite');
@@ -156,6 +165,7 @@ export {
     saveDataLocally,
     getLocalData,
     getProjsByDate,
+    getLocalDataCount,
     searchProjs,
     setLastUpdated,
     addDataLocally,

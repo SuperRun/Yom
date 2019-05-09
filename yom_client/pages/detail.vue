@@ -163,7 +163,7 @@
                 'projtype'
             ])
         },
-        async created () {
+        async mounted () {
 
             const vm = this;
 

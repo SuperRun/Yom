@@ -1,44 +1,46 @@
 <template>
-    <EasyRefresh :userSelect="false"
-                 :loadMore="loadMore">
-        <v-container>
-            <v-timeline dense
-                        v-for="(proj, index) in projects"
-                        :key="index"
-            >
-                <v-timeline-item
-                        v-bind:color="itemColor[index%itemColor.length]"
-                        small>
-                    <v-layout row
-                              pa-2
-                              pl-3
-                              class="white elevation-3"
-                              @click="edit(proj)">
-                        <v-flex xs3>
-                            <h3 v-bind:class="[itemColorText[index%itemColorText.length],'display-1', 'font-weight-bold']">
-                                {{proj.created_at.split('T')[0].split('-')[2]}}
-                            </h3>
-                            <p>{{proj.created_at.split('T')[0].split('-')[1] + '.' + proj.created_at.split('T')[0].split('-')[0]}}</p>
-                        </v-flex>
-                        <v-flex xs9>
-                            <h3>{{proj.projName || 'Project Name'}}</h3>
-                            <p>{{proj.description || 'No description.'}}</p>
-                        </v-flex>
-                    </v-layout>
-                </v-timeline-item>
-            </v-timeline>
-            <div class="title
-             grey--text
-             text-lighten-1"
-                 mt-5
-                 v-if="!projects.length">There is no project.</div>
-        </v-container>
-    </EasyRefresh>
+    <no-ssr>
+        <EasyRefresh :userSelect="false"
+                     :loadMore="loadMore">
+            <v-container>
+                <v-timeline dense
+                            v-for="(proj, index) in projects"
+                            :key="index"
+                >
+                    <v-timeline-item
+                            v-bind:color="itemColor[index%itemColor.length]"
+                            small>
+                        <v-layout row
+                                  pa-2
+                                  pl-3
+                                  class="white elevation-3"
+                                  @click="edit(proj)">
+                            <v-flex xs3>
+                                <h3 v-bind:class="[itemColorText[index%itemColorText.length],'display-1', 'font-weight-bold']">
+                                    {{proj.created_at.split('T')[0].split('-')[2]}}
+                                </h3>
+                                <p>{{proj.created_at.split('T')[0].split('-')[1] + '.' + proj.created_at.split('T')[0].split('-')[0]}}</p>
+                            </v-flex>
+                            <v-flex xs9>
+                                <h3>{{proj.projName || 'Project Name'}}</h3>
+                                <p>{{proj.description || 'No description.'}}</p>
+                            </v-flex>
+                        </v-layout>
+                    </v-timeline-item>
+                </v-timeline>
+                <div class="title
+                 grey--text
+                 text-lighten-1"
+                     mt-5
+                     v-if="!projects.length">There is no project.</div>
+            </v-container>
+        </EasyRefresh>
+    </no-ssr>
 </template>
 
 <script>
     import axios from '~/plugins/axios'
-    import { createIndexedDB, saveDataLocally, setLastUpdated, searchProjs, getProjsByDate, STORE_NAME_PROJ, DB_NAME_PROJ } from 'assets/js/idbUtil'
+    import { createIndexedDB, saveDataLocally, setLastUpdated, searchProjs, getProjsByDate, getLocalDataCount, STORE_NAME_PROJ, DB_NAME_PROJ } from 'assets/js/idbUtil'
     import { createNamespacedHelpers } from 'vuex'
     const { mapMutations, mapGetters } = createNamespacedHelpers('newProj');
 
@@ -81,13 +83,15 @@
                 'checkedCatsTree'
             ])
         },
-        async created () {
+        async mounted () {
             const vm = this;
-            await vm.getProjects().then(async (data) => {
+            await vm.getCount();
+            console.log(`mounted count = ${vm.count}`);
+            await vm.getProjects().then(async (res) => {
 
                 const dbPromise = await createIndexedDB(DB_NAME_PROJ, STORE_NAME_PROJ,1,['date']);
-                vm.$store.commit('indexedDB/setProjects',vm.moreProjects);
 
+                vm.$store.commit('indexedDB/setProjects',vm.moreProjects);
                 await saveDataLocally(dbPromise, STORE_NAME_PROJ, vm.projects)
                     .then(()=>(setLastUpdated(new Date())))
                     .catch(err=>(console.log(`Save Data Error: ${err}`)));
@@ -95,11 +99,14 @@
                 dbPromise.close();
 
             }).catch(async err => {
+
                 const { endTime, projName, startTime } = this.$route.query;
                 const query = { endTime, projName, startTime };
 
                 console.log('Network requests have failed, this is expected if offline');
-                const dbPromise = await createIndexedDB(DB_NAME_PROJ, STORE_NAME_PROJ,1);
+
+                const dbPromise = await createIndexedDB(DB_NAME_PROJ, STORE_NAME_PROJ);
+
                 let projects = [];
                 if (!Object.keys(this.$route.query).length){
                     projects = await getProjsByDate(dbPromise);
@@ -111,6 +118,7 @@
                 }
                 console.log(projects);
                 vm.$store.commit('indexedDB/setProjects', projects);
+
                 dbPromise.close();
             });
         },
@@ -155,23 +163,34 @@
                 console.log(selectedCats);
             },
             async loadMore(done){
-                if ((this.page * this.limit) <= this.count) {
+                console.log(`page = ${this.page}; cont/limit = ${Math.ceil(this.count/this.limit)}`);
+                if (this.page <= Math.ceil(this.count/this.limit)) {
                     ++this.page;
-                    await this.getProjects();
-                    this.$store.commit('indexedDB/loadProjects', this.moreProjects);
-                    // this.projects = this.projects.concat(this.moreProjects);
-                    const dbPromise = await createIndexedDB(DB_NAME_PROJ, STORE_NAME_PROJ);
-                    await saveDataLocally(dbPromise, STORE_NAME_PROJ, this.projects)
-                        .then(()=>(setLastUpdated(new Date())))
-                        .catch(err=>(console.log(`Save Data Error: ${err}`)));
-                    dbPromise.close();
-                    done(true);
-                } else {
-                    done(false);
+                    console.log(`page = ${this.page}`);
+                    const vm = this;
+                    await this.getProjects()
+                        .then(async res=>{
+                            if (vm.moreProjects.length) {
+                                this.$store.commit('indexedDB/loadProjects', vm.moreProjects);
+                                const dbPromise = await createIndexedDB(DB_NAME_PROJ, STORE_NAME_PROJ);
+                                await saveDataLocally(dbPromise, STORE_NAME_PROJ, vm.projects)
+                                    .catch(err=>(console.log(`Save Data Error: ${err}`)));
+                                dbPromise.close();
+                                done(false);
+                            }else {
+                                done(true);
+                            }
+                        })
+                        .catch(err=>{
+                            console.log(`Network Error: ${err}`);
+                            done(true);
+                        });
                 }
             },
             async getProjects(){
                 const { endTime, projName, startTime } = this.$route.query;
+
+                this.moreProjects = [];
 
                 this.moreProjects = await axios.get('/projects',{
                     params: {
@@ -198,12 +217,16 @@
                         user: this.$store.state.auth.id,
                         created_at_lte: endTime,
                         created_at_gte: startTime,
-
                         projName_contains: projName
                     }
                 }).then((res)=>{
                     console.log(res.data);
                     return res.data
+                }).catch(async (err)=>{
+                    const dbPromise = await createIndexedDB(DB_NAME_PROJ, STORE_NAME_PROJ);
+                    const count = await getLocalDataCount(dbPromise, STORE_NAME_PROJ).then(res=>{return res});
+                    console.log(`offline count = ${count}`);
+                    return count;
                 });
             }
         }

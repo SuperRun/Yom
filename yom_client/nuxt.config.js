@@ -43,10 +43,10 @@ export default {
   plugins: [
     '@/plugins/vuetify',
     '@/plugins/axios',
-    {
-        src: '~/plugins/regist-sw.js',
-        ssr: false
-    },
+    // {
+    //     src: '~/plugins/regist-sw.js',
+    //     ssr: false
+    // },
     {
         src: '~/plugins/easyRefresh.js',
         ssr: false
@@ -105,7 +105,7 @@ export default {
     */
     extend(config, ctx) {
     }
-  },
+  }, // 'https://strapiserver.herokuapp.com'
   env: {
     baseUrl: process.env.BASE_URL || 'https://strapiserver.herokuapp.com'
   }

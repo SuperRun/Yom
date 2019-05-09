@@ -74,8 +74,7 @@ if (workbox) {
     });
 
     const baseUrl = 'https://strapiserver.herokuapp.com';
-
-    console.log(baseUrl);
+    // const baseUrl = 'http://localhost:1337';
 
     workbox.routing.registerRoute(
         new RegExp(`${baseUrl}/projects`),
@@ -89,14 +88,13 @@ if (workbox) {
         'PUT'
     );
 
-    // workbox.routing.registerRoute(
-    //     /http:\/\/localhost:1337\/projhistorycats/,
-    //     networkWithBackgroundSyncForUpdate,
-    //     'PUT'
-    // );
+
+    // workbox.routing.registerRoute(/\/_nuxt\/.*/, workbox.strategies.cacheFirst());
+    // workbox.routing.registerRoute(/\/.*/, workbox.strategies.networkFirst());
 
     workbox.routing.registerRoute(new RegExp('/_nuxt/(?!.*(__webpack_hmr|hot-update))'), new workbox.strategies.CacheFirst ({}), 'GET')
-    workbox.routing.registerRoute(new RegExp('/(?!.*(__webpack_hmr|hot-update))'), new workbox.strategies.NetworkFirst ({}), 'GET')
+    workbox.routing.registerRoute(/\/.*/, new workbox.strategies.NetworkFirst(), 'GET');
+    // workbox.routing.registerRoute(new RegExp('http://localhost:3000/chooseType'), new workbox.strategies.NetworkFirst ({}), 'GET')
 
 } else {
     console.log(`Boo! Workbox didn't load 😬`);

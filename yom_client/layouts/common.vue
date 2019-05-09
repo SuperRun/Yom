@@ -2,7 +2,7 @@
     <v-app>
         <v-layout row
                   align-center
-                  class="themeColor" style="height: 7%">
+                  class="themeColor" style="max-height: 7% !important">
             <v-flex xs2>
                 <v-btn icon @click="goBack">
                     <v-icon color="#ffffff">keyboard_backspace</v-icon>
