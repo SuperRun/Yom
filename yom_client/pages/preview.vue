@@ -1,5 +1,5 @@
-<template>
-    <v-container color="grey lighten-5">
+<template >
+    <v-container color="grey lighten-5 " id='x'>
 
         <v-layout color="white"
                   column
@@ -8,7 +8,7 @@
             <v-flex class="font-weight-medium"
                     align-self-center
                     mb-3>
-                <h1>{{projNameShare || 'No project name'}}</h1>
+                <h1 id="name">{{projNameShare || 'No project name'}}</h1>
             </v-flex>
             <v-flex>
                 <div>
@@ -51,6 +51,8 @@
                        :to="`/detail?id=${id}`">Edit</v-btn>
                 <v-btn class="themeColor btn white--text mx-auto"
                        @click="validateProjName">Save</v-btn>
+				<v-btn class="themeColor btn white--text mx-auto"
+                        @click="saveasimage" >GENERATE PICTURE</v-btn>
             </v-flex>
         </v-layout>
 
@@ -160,6 +162,10 @@
 </template>
 
 <script>
+	import $ from 'jquery'
+	import jquery from 'jquery'
+	import domtoimage from 'dom-to-image'
+	import { saveAs } from 'file-saver';
     import { createNamespacedHelpers } from 'vuex'
     import { createIndexedDB, addDataLocally, updateProj, DB_NAME_PROJ, STORE_NAME_PROJ } from 'assets/js/idbUtil'
     import { getNowFormatDate } from 'assets/js/util'
@@ -369,6 +375,19 @@
                     }, 1000);
                 });
             },
+			saveasimage(){
+				var node = document.getElementById('x');
+				domtoimage.toPng(node)
+					.then(function (dataUrl) {
+						var img = new Image();
+                        img.src = dataUrl;
+                        document.body.appendChild(img);
+                    });
+				domtoimage.toBlob(document.getElementById('x'))
+					.then(function (blob) {
+						window.saveAs(blob, "x");
+					});
+			},	
         }
     }
 </script>
