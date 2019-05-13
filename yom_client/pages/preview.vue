@@ -408,7 +408,22 @@
                 });
             },
 			saveasimage(){
+				var date = new Date();
+				var seperator1 = "-";
+				var seperator2 = "_";
+				var month = date.getMonth() + 1;
+				var strDate = date.getDate();
+				if (month >= 1 && month <= 9) {
+					month = "0" + month;
+				}
+				if (strDate >= 0 && strDate <= 9) {
+					strDate = "0" + strDate;
+				}
+				var currentdate = date.getFullYear() + seperator1 + month + seperator1 + strDate
+					+ " " + date.getHours() + seperator2 + date.getMinutes()
+					+ seperator2 + date.getSeconds();
 				var node = document.getElementById('x');
+				var name = "projname_" + $('h1').text() + " time_" + currentdate;
 				domtoimage.toPng(node)
 					.then(function (dataUrl) {
 						var img = new Image();
@@ -417,8 +432,9 @@
                     });
 				domtoimage.toBlob(document.getElementById('x'))
 					.then(function (blob) {
-						window.saveAs(blob, "x");
+						window.saveAs(blob,name);
 					});
+				alert("picture saved as " + name + ".png,you can see the picture below")
 			},	
         }
     }
