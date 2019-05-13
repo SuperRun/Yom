@@ -89,12 +89,13 @@ async function getLocalData(db, storeName) {
 async function getLocalDataCount(db, storeName) {
     return await db.count(storeName);
 }
-// async function getLocalDataCount(db, storeName) {
-//     return await db.getAll(storeName).then(res =>{
-//         console.log(`getLocalDataCount res=${res.length}`);
-//         return res.length;
-//     });
-// }
+async function getLocalDataByKeyPath(db, storeName, val) {
+    // console.log(`projId=${val}`);
+    // console.log(`storeName=${storeName}`);
+    // const value = await db.get(storeName, 139);
+    // console.log(value);
+    return await db.get(storeName, parseInt(val));
+}
 
 async function updateProj(db, id, proj){
     const tx = db.transaction('projects','readwrite');
@@ -170,6 +171,7 @@ export {
     setLastUpdated,
     addDataLocally,
     updateProj,
+    getLocalDataByKeyPath,
     DB_NAME_TYPE,
     DB_NAME_CATCONFIG,
     DB_NAME_PROJ,

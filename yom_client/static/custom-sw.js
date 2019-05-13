@@ -13,7 +13,7 @@ workbox.setConfig({
 workbox.core.clientsClaim()
 
 // Skip over the SW waiting lifecycle stage
-// workbox.core.skipWaiting()
+workbox.core.skipWaiting()
 
 workbox.precaching.cleanupOutdatedCaches()
 
@@ -93,7 +93,7 @@ if (workbox) {
     // workbox.routing.registerRoute(/\/.*/, workbox.strategies.networkFirst());
 
     workbox.routing.registerRoute(new RegExp('/_nuxt/(?!.*(__webpack_hmr|hot-update))'), new workbox.strategies.CacheFirst ({}), 'GET')
-    workbox.routing.registerRoute(/\/.*/, new workbox.strategies.NetworkFirst(), 'GET');
+    workbox.routing.registerRoute(/\/.*/, new workbox.strategies.NetworkFirst({}), 'GET');
     // workbox.routing.registerRoute(new RegExp('http://localhost:3000/chooseType'), new workbox.strategies.NetworkFirst ({}), 'GET')
 
 } else {

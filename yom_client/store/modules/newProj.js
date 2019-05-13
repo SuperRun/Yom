@@ -138,6 +138,14 @@ const mutations = {
         state.catList.map(cat =>{
             state.selectedCatsShare.find(selectedCat => (cat.id?selectedCat === cat.id:selectedCat === cat.catId))?cat.isChecked=1:cat.isChecked=0;
         })
+    },
+    getSelectedCatsShare(state){
+        let selectedCats = state.catList.map(cat=> {
+            if(cat.isChecked && cat.parentId){
+                return cat.id?cat.id:cat.catId;
+            }
+        }).filter(cat=>cat);
+        state.selectedCatsShare = selectedCats;
     }
 }
 

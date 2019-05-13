@@ -48,7 +48,7 @@
                     class="flex-width">
                 <v-btn class="themeColor btn white--text mx-auto"
                        v-if="id"
-                       :to="`/detail?id=${id}`">Edit</v-btn>
+                       :to="`/detail?id=${id}&&type=${type}`">Edit</v-btn>
                 <v-btn class="themeColor btn white--text mx-auto"
                        @click="validateProjName">Save</v-btn>
 				<v-btn class="themeColor btn white--text mx-auto"
@@ -167,7 +167,7 @@
 	import domtoimage from 'dom-to-image'
 	import { saveAs } from 'file-saver';
     import { createNamespacedHelpers } from 'vuex'
-    import { createIndexedDB, addDataLocally, updateProj, DB_NAME_PROJ, STORE_NAME_PROJ } from 'assets/js/idbUtil'
+    import { createIndexedDB, addDataLocally, updateProj, getLocalDataByKeyPath, DB_NAME_PROJ, STORE_NAME_PROJ } from 'assets/js/idbUtil'
     import { getNowFormatDate } from 'assets/js/util'
     import axios from '~/plugins/axios'
     const { mapGetters, mapMutations } = createNamespacedHelpers('newProj')
@@ -183,7 +183,8 @@
                 fillDialog: false,
                 isSave: true,
                 isOffline: false,
-                projName: ''
+                projName: '',
+                type: ''
             }
         },
         computed: {
@@ -201,18 +202,49 @@
                 'projtype'
             ])
         },
-        created (){
-            console.log(this.$route);
+        created(){
+            console.log('created');
+        },
+        async mounted (){
+            console.log('mounted');
             if(this.id){
                 this.isSave = false;
-                console.log(this.$route.query.id);
+                const dbPromise = await createIndexedDB(DB_NAME_PROJ, STORE_NAME_PROJ);
+                let proj = await getLocalDataByKeyPath(dbPromise, STORE_NAME_PROJ, this.id);
+                dbPromise.close();
+
+                console.log(proj);
+
+                await axios.get(`/projects/${this.id}`).then(res=>{
+                    const data = res.data;
+                    proj = data;
+                }).catch(async err=>{
+                    // get data from indexdb
+                    console.log(`Network err: ${err}`);
+                });
+                // this.type = proj.projtype.id;
+                this.setCatList(proj.projhistorycats);
+                this.convertToCatTree(proj.projhistorycats);
+                this.setProjNameShare(proj);
+                this.setDescriptionShare(proj);
+                this.setTimeTotal(proj.timeTotal);
+                this.getSelectedCatsShare();
+                this.convertCheckedCatTree();
+
             }
         },
         methods:{
             ...mapMutations ([
                 'setProjNameShare',
                 'initData',
-                'updateCatList'
+                'updateCatList',
+                'setCatList',
+                'convertToCatTree',
+                'setDescriptionShare',
+                'setTimeTotal',
+                'convertCheckedCatTree',
+                'setSelectedCatsShare',
+                'getSelectedCatsShare'
             ]),
             edit(){
                 this.isSave = true;

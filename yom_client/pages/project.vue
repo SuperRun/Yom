@@ -138,30 +138,30 @@
             ]),
             edit (proj) {
                 console.log(proj);
-                this.setCatList(proj.projhistorycats);
-                this.convertToCatTree(proj.projhistorycats);
-                this.setProjNameShare(proj);
-                this.setDescriptionShare(proj);
-                this.setTimeTotal(proj.timeTotal);
-                this.getSelectedCatsShare();
-                this.convertCheckedCatTree();
-                console.log('catList');
-                console.log(this.catList);
-                console.log('catTree');
-                console.log(this.catTree);
-                console.log('checkedCatsTree');
-                console.log(this.checkedCatsTree);
+                // this.setCatList(proj.projhistorycats);
+                // this.convertToCatTree(proj.projhistorycats);
+                // this.setProjNameShare(proj);
+                // this.setDescriptionShare(proj);
+                // this.setTimeTotal(proj.timeTotal);
+                // this.getSelectedCatsShare();
+                // this.convertCheckedCatTree();
+                // console.log('catList');
+                // console.log(this.catList);
+                // console.log('catTree');
+                // console.log(this.catTree);
+                // console.log('checkedCatsTree');
+                // console.log(this.checkedCatsTree);
                 this.$router.push(`/preview?id=${proj.id}`);
             },
-            getSelectedCatsShare(){
-                let selectedCats = this.catList.map(cat=> {
-                    if(cat.isChecked && cat.parentId){
-                        return cat.id?cat.id:cat.catId;
-                    }
-                }).filter(cat=>cat);
-                this.setSelectedCatsShare(selectedCats);
-                console.log(selectedCats);
-            },
+            // getSelectedCatsShare(){
+            //     let selectedCats = this.catList.map(cat=> {
+            //         if(cat.isChecked && cat.parentId){
+            //             return cat.id?cat.id:cat.catId;
+            //         }
+            //     }).filter(cat=>cat);
+            //     this.setSelectedCatsShare(selectedCats);
+            //     console.log(selectedCats);
+            // },
             async loadMore(done){
                 console.log(`page = ${this.page}; cont/limit = ${Math.ceil(this.count/this.limit)}`);
                 if (this.page <= Math.ceil(this.count/this.limit)) {

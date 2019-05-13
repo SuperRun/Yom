@@ -122,7 +122,7 @@
 
 <script>
     import axios from '~/plugins/axios'
-    import { createIndexedDB, saveDataLocally, getLocalData, DB_NAME_CATCONFIG, STORE_NAME_CATCONFIG } from 'assets/js/idbUtil'
+    import { createIndexedDB, saveDataLocally, getLocalData, getLocalDataByKeyPath, DB_NAME_CATCONFIG, DB_NAME_PROJ, STORE_NAME_PROJ } from 'assets/js/idbUtil'
     import { createNamespacedHelpers } from 'vuex'
     import { copyList } from 'assets/js/util'
     const { mapMutations, mapGetters } = createNamespacedHelpers('newProj')
@@ -164,14 +164,45 @@
             ])
         },
         async mounted () {
+            // regist refresh event
+
+
 
             const vm = this;
+
 
             if (!vm.type && !vm.id) {
                 vm.$router.replace({path:'/chooseType'});
             }
 
-            this.setProjtype(vm);
+            if (vm.id){
+                console.log(vm.catTree);
+                if (!vm.catTree.length) {
+                    const dbPromise = await createIndexedDB(DB_NAME_PROJ, STORE_NAME_PROJ);
+                    let proj = await getLocalDataByKeyPath(dbPromise, STORE_NAME_PROJ, this.id);
+                    dbPromise.close();
+
+                    console.log(proj);
+
+                    await axios.get(`/projects/${this.id}`).then(res=>{
+                        const data = res.data;
+                        proj = data;
+                    }).catch(async err=>{
+                        // get data from indexdb
+                        console.log(`Network err: ${err}`);
+                    });
+
+                    // this.type = proj.projtype.id;
+                    this.setCatList(proj.projhistorycats);
+                    this.convertToCatTree(proj.projhistorycats);
+                    this.setProjNameShare(proj);
+                    this.setDescriptionShare(proj);
+                    this.setTimeTotal(proj.timeTotal);
+                    this.getSelectedCatsShare();
+                }
+            }
+
+            // this.setProjtype(vm);
 
             if (vm.projNameShare) {
                 vm.projName = vm.projNameShare;
@@ -186,6 +217,7 @@
                 vm.selectedCats = vm.selectedCatsShare;
             }
 
+            // when first load detail page
             if (!vm.catList.length && vm.type) {
 
                 let CURRENT_VERSION = await vm.getDbVersion() || 1;
@@ -234,8 +266,8 @@
                 'setCheckedCatsTree',
                 'convertToCatTree',
                 'convertCheckedCatTree',
-                'initData',
-                'setProjtype'
+                'getSelectedCatsShare',
+                'initData'
             ]),
             convertCheckedCatsToTree () {
                 const vm = this;

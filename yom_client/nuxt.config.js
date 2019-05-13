@@ -60,6 +60,9 @@ export default {
   modules: [
       '@nuxtjs/pwa'
   ],
+  router: {
+    prefetchLinks: false
+  },
 
   /*
   ** Customize app manifest
