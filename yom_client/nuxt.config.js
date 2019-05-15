@@ -110,6 +110,6 @@ export default {
     }
   }, // 'https://strapiserver.herokuapp.com'
   env: {
-    baseUrl: process.env.BASE_URL || 'https://strapiserver.herokuapp.com'
+    baseUrl: process.env.BASE_URL || 'http://localhost:1337' // 'https://strapiserver.herokuapp.com'
   }
 }

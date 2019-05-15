@@ -97,25 +97,52 @@ async function getLocalDataByKeyPath(db, storeName, val) {
     return await db.get(storeName, parseInt(val));
 }
 
-async function updateProj(db, id, proj){
+async function updateProj(db, id, val){
     const tx = db.transaction('projects','readwrite');
     const store= tx.store;
     let cursor = await store.openCursor();
-    console.log('id',typeof id);
+    console.log('id',id);
     while(cursor){
         console.log('key',typeof cursor.key);
         console.log(cursor.key === parseInt(id));
         if (cursor.key === parseInt(id)){
             // cursor.value = proj;
-            Object.assign(proj, {
-                id: parseInt(id),
-                created_at: cursor.value.created_at
-            });
-            console.log(proj);
-            const request = cursor.update(proj);
-            request.onsuccess = function() {
-                console.log(`update success`);
-            };
+            // if (typeof val === 'number'){
+            //     const proj = { ...cursor.value };
+            //     proj.id = val;
+            //     val = proj;
+            // } else{
+            //     Object.assign(val, {
+            //         id: parseInt(id),
+            //         created_at: cursor.value.created_at
+            //     });
+            // }
+            if (typeof val === 'object'){ 
+               
+                if (Object.keys(val).indexOf('id')=== -1){
+                    // 编辑项目后保持indexdb数据一致
+                    Object.assign(val, {
+                        id: parseInt(id),
+                        created_at: cursor.value.created_at
+                    });
+                } else {
+                    // 更改id值 isSaved的值
+                    const proj = { ...cursor.value };
+                    for(let [key,value] of Object.entries(val)){
+                        if (key === 'isSaved' && value){
+                            delete proj[key];
+                        }else{
+                            proj[key] = value;
+                        }
+                    }
+                    val =proj;
+                }
+
+            }
+
+            console.log(`val`);
+            console.log(val);
+            cursor.update(val);
             break;
         }
         cursor = await cursor.continue();
@@ -123,6 +150,7 @@ async function updateProj(db, id, proj){
     await tx.done;
 
 }
+
 
 async function getProjsByDate(db){
    return await db.getAllFromIndex('projects', 'createdAtIndex');

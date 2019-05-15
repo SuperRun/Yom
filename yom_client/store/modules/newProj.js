@@ -27,7 +27,7 @@ const getters = {
 }
 
 const mutations = {
-    setProjtype: (state, payload) => (state.projtype = payload.type),
+    setProjtype: (state, val) => (state.projtype = val),
     setProjNameShare: (state, payload) => (state.projNameShare = payload.projName),
     setDescriptionShare: (state, payload) => (state.descriptionShare = payload.description),
     setSelectedCatsShare: (state, selectedCats) => (state.selectedCatsShare = selectedCats),

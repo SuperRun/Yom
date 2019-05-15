@@ -118,12 +118,17 @@ module.exports = {
    * @return {Promise}
    */
   addProjAndHistoryCats: async (values) => {
+    if(values.id){
+      delete values.id;
+    }
+    console.log(values);
     const data = await module.exports.add(values);
     console.log(data.id);
     Array.from(values.projhistorycats, cat => {
       Object.assign(cat, {project: data.id});
     });
     const obj = projhistorycat.addBulk(values.projhistorycats);
+    if (obj.code) Object.assign(obj, {data: {projId: data.id}});
     return obj;
   },
 

@@ -48,7 +48,7 @@
                     class="flex-width">
                 <v-btn class="themeColor btn white--text mx-auto"
                        v-if="id"
-                       :to="`/detail?id=${id}&&type=${type}`">Edit</v-btn>
+                       :to="`/detail?id=${id}`">Edit</v-btn>
                 <v-btn class="themeColor btn white--text mx-auto"
                        @click="validateProjName">Save</v-btn>
 				<v-btn class="themeColor btn white--text mx-auto"
@@ -183,8 +183,7 @@
                 fillDialog: false,
                 isSave: true,
                 isOffline: false,
-                projName: '',
-                type: ''
+                projName: ''
             }
         },
         computed: {
@@ -207,29 +206,34 @@
         },
         async mounted (){
             console.log('mounted');
-            if(this.id){
+            console.log(this.catTree);
+            if(this.id && !this.catTree.length){
+                console.log('not from detail page');
                 this.isSave = false;
                 const dbPromise = await createIndexedDB(DB_NAME_PROJ, STORE_NAME_PROJ);
-                let proj = await getLocalDataByKeyPath(dbPromise, STORE_NAME_PROJ, this.id);
+                let proj = await getLocalDataByKeyPath(dbPromise, STORE_NAME_PROJ, this.id) || {};
                 dbPromise.close();
 
-                console.log(proj);
-
-                await axios.get(`/projects/${this.id}`).then(res=>{
-                    const data = res.data;
-                    proj = data;
-                }).catch(async err=>{
-                    // get data from indexdb
-                    console.log(`Network err: ${err}`);
-                });
+                if (!proj.hasOwnProperty('isSaved')){
+                    await axios.get(`/projects/${this.id}`).then(res=>{
+                        const data = res.data;
+                        proj = data;
+                    }).catch(async err=>{
+                        // get data from indexdb
+                        console.log(`Network err: ${err}`);
+                    });
+                }
                 // this.type = proj.projtype.id;
-                this.setCatList(proj.projhistorycats);
-                this.convertToCatTree(proj.projhistorycats);
-                this.setProjNameShare(proj);
-                this.setDescriptionShare(proj);
-                this.setTimeTotal(proj.timeTotal);
-                this.getSelectedCatsShare();
-                this.convertCheckedCatTree();
+                console.log(proj);
+                if (Object.keys(proj).length !== 0) {
+                    this.setCatList(proj.projhistorycats);
+                    this.convertToCatTree(proj.projhistorycats);
+                    this.setProjNameShare(proj);
+                    this.setDescriptionShare(proj);
+                    this.setTimeTotal(proj.timeTotal);
+                    this.getSelectedCatsShare();
+                    this.convertCheckedCatTree();
+                }
 
             }
         },
@@ -297,7 +301,8 @@
 
                 const dbPromise = await createIndexedDB(DB_NAME_PROJ, STORE_NAME_PROJ);
                 const projId = await addDataLocally(dbPromise, STORE_NAME_PROJ, newProj);
-                dbPromise.close();
+
+                console.log(`save projtype = ${projtype}`);
 
                 await axios({
                     method: 'post',
@@ -307,11 +312,18 @@
                         'Content-Type': 'application/json',
                         'X-Mark-Id': projId
                     }
-                }).then(res=>{
+                }).then(async res=>{
+                    // 保存成功更改indexdb中的id
                     console.log(`Save a project succeed:${res}`);
+                    if (projId !== res.data.projId){
+                        await updateProj(dbPromise, projId, {id: res.data.projId, isSaved: true});
+                    }
                 }).catch(async err => {
+                    // 保存失败增加isSaved: false  传入的id与重新编辑的更新做区别
                     console.log(`Save a project failed:${err}`);
+                    await updateProj(dbPromise, projId, {id: projId, isSaved: false});
                 }).finally(()=>{
+                    dbPromise.close();
                     setTimeout(() => {
                         vm.savingDialog = false;
                         vm.initData();
@@ -333,6 +345,8 @@
                     projhistorycats: catList,
                     user: this.$store.state.auth.id
                 };
+                console.log('editProj');
+                console.log(editProj);
                 const dbPromise = await createIndexedDB(DB_NAME_PROJ, STORE_NAME_PROJ, 1);
                 await updateProj(dbPromise, id, editProj);
                 dbPromise.close();
@@ -351,10 +365,16 @@
                             'Content-Type': 'application/json',
                             'X-Mark-Id': id
                         }
-                    }).then(res=>{
+                    }).then(async res=>{
+                        // 保存成功更改indexdb中的id
                         console.log(`Save a project succeed:${res}`);
+                        if (projId !== res.data.projId){
+                            await updateProj(dbPromise, id, {id: res.data.projId, isSaved: true});
+                        }
                     }).catch(async err => {
+                        // 更新失败增加isSaved: false  传入的id与重新编辑的更新做区别
                         console.log(`Save a project failed:${err}`);
+                        // await updateProj(dbPromise, id, {id: projId, isSaved: false});
                     }).finally(()=>{
                         setTimeout(() => {
                             vm.savingDialog = false;
