@@ -450,7 +450,7 @@
                         img.src = dataUrl;
                         document.body.appendChild(img);
                     });
-				domtoimage.toBlob(document.getElementById('x'))
+				domtoimage.toBlob(document.getElementById('x'),{ bgcolor:"white" })
 					.then(function (blob) {
 						window.saveAs(blob,name);
 					});
