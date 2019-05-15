@@ -73,8 +73,8 @@ if (workbox) {
         plugins: [bgSyncPluginForUpdate],
     });
 
-    // const baseUrl = 'https://strapiserver.herokuapp.com';
-     const baseUrl = 'http://localhost:1337';
+    const baseUrl = 'https://strapiserver.herokuapp.com';
+     // const baseUrl = 'http://localhost:1337';
 
     workbox.routing.registerRoute(
         new RegExp(`${baseUrl}/projects`),
