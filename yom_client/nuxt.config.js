@@ -58,12 +58,23 @@ export default {
   ** Nuxt.js modules
   */
   modules: [
-      '@nuxtjs/pwa'
+      '@nuxtjs/onesignal',
+      '@nuxtjs/pwa',
   ],
   router: {
     prefetchLinks: false
   },
 
+ oneSignal: {
+    init: {
+      appId: '02440743-6079-4840-b62b-d4213d2989c0',
+      allowLocalhostAsSecureOrigin: true,
+      welcomeNotification: {
+        disable: true
+      }
+    }
+  },
+  
   /*
   ** Customize app manifest
   */
@@ -110,6 +121,6 @@ export default {
     }
   }, // 'https://strapiserver.herokuapp.com'
   env: {
-    baseUrl: process.env.BASE_URL || 'https://strapiserver.herokuapp.com'
+    baseUrl: 'https://strapiserver.herokuapp.com'
   }
 }

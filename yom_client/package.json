@@ -12,6 +12,7 @@
     "heroku-postbuild": "npm run build"
   },
   "dependencies": {
+    "@nuxtjs/onesignal": "^3.0.0-beta.16",
     "@nuxtjs/pwa": "^3.0.0-beta.14",
     "axios": "^0.18.0",
     "cookieparser": "^0.1.0",
