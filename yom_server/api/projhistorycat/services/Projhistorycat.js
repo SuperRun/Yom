@@ -134,7 +134,6 @@ module.exports = {
         obj.code = FAIL_CODE;
         obj.msg = 'create unsuccessfully';
         await module.exports.removeBulk(saveArr);
-        return obj;
       }
     }
     return obj;
