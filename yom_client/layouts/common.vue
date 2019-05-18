@@ -2,9 +2,9 @@
     <v-app>
         <v-layout row
                   align-center
-                  class="themeColor" style="height: 7%">
+                  class="themeColor" style="max-height: 7% !important">
             <v-flex xs2>
-                <v-btn icon @click="goBack">
+                <v-btn icon :to="routeUrl">
                     <v-icon color="#ffffff">keyboard_backspace</v-icon>
                 </v-btn>
             </v-flex>
@@ -34,12 +34,23 @@
                         ["project", "My Project"],
                         ["search", "Search"]
                     ]
+                ),
+                routeMap: new Map([
+                        ["chooseType", "/userStart"],
+                        ["detail", "/chooseType"],
+                        ["preview", "/detail"],
+                        ["project", "/preview"],
+                        ["search", "/userStart"]
+                    ]
                 )
             }
         },
         computed:{
             title: function () {
                 return this.titleMap.get(this.$route.name);
+            },
+            routeUrl: function () {
+                return this.routeMap.get(this.$route.name);
             }
         },
         methods: {

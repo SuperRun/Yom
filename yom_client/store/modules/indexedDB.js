@@ -7,7 +7,7 @@ const getters = {
 }
 
 const mutations = {
-    addProjToProjects: (state, project) => {console.log(project);state.projects.unshift(project);console.log(state.projects);},
+    addProjToProjects: (state, project) => {state.projects.unshift(project);},
     setProjects: (state, projects) => (state.projects = projects),
     loadProjects: (state, projects) => (state.projects = state.projects.concat(projects))
 }

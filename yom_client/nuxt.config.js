@@ -43,50 +43,52 @@ export default {
   plugins: [
     '@/plugins/vuetify',
     '@/plugins/axios',
-    {
-        src: '~/plugins/regist-sw.js',
-        ssr: false
-    },
+<<<<<<< HEAD
+    { src: '~/plugins/regist-sw.js', ssr: false},
+    { src: '~/plugins/easyRefresh.js', ssr: false},
+    { src: '~plugins/ga.js', ssr: false }
+=======
+    // {
+    //     src: '~/plugins/regist-sw.js',
+    //     ssr: false
+    // },
     {
         src: '~/plugins/easyRefresh.js',
         ssr: false
     }
 
+>>>>>>> 9ca7893138efeae51b4bf3c07da9ee7ebf6de14e
   ],
 
   /*
   ** Nuxt.js modules
   */
   modules: [
-      '@nuxtjs/pwa'
+      '@nuxtjs/onesignal',
+      '@nuxtjs/pwa',
   ],
+  router: {
+    prefetchLinks: false
+  },
 
+ oneSignal: {
+    init: {
+      appId: '02440743-6079-4840-b62b-d4213d2989c0',
+      allowLocalhostAsSecureOrigin: true,
+      welcomeNotification: {
+        disable: true
+      }
+    }
+  },
+  
   /*
   ** Customize app manifest
   */
   manifest: {
       name: "YOM"
   },
-
-  /*
-  ** Workbox configuration
-  */
   workbox: {
       swURL: 'custom-sw.js'
-      // runtimeCaching:[
-      //     {
-      //         urlPattern: 'http://localhost:1337/projects',
-      //         handler: 'networkOnly',
-      //         method: 'POST',
-      //         strategyOptions: {
-      //             plugins:[{
-      //                 fetchDidFail: async ({originalRequest, request, error, event}) => {
-      //                     console.log(originalRequest)
-      //                 }
-      //             }]
-      //         }
-      //     }
-      // ]
   },
 
   /*
@@ -105,8 +107,8 @@ export default {
     */
     extend(config, ctx) {
     }
-  },
+  }, // 'https://strapiserver.herokuapp.com'
   env: {
-    baseUrl: process.env.BASE_URL || 'https://strapiserver.herokuapp.com'
+    baseUrl: 'https://strapiserver.herokuapp.com'
   }
 }

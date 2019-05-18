@@ -5,10 +5,10 @@ const buildSW = () => {
     // This will return a Promise
     return workboxBuild.injectManifest({
         swSrc: 'static/custom-sw.js',
-        swDest: 'dist/custom-sw.js',
-        globDirectory: 'dist',
+        swDest: 'static/sw.js',
+        globDirectory: './.nuxt/',
         globPatterns: [
-            '**\/*.{js,css,html,png}',
+            '**/*.{html,js,css,png,jpg}'
         ]
     }).then(({count, size, warnings}) => {
         // Optionally, log any warnings and details.

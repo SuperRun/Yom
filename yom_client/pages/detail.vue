@@ -122,7 +122,7 @@
 
 <script>
     import axios from '~/plugins/axios'
-    import { createIndexedDB, saveDataLocally, getLocalData, DB_NAME_CATCONFIG, STORE_NAME_CATCONFIG } from 'assets/js/idbUtil'
+    import { createIndexedDB, saveDataLocally, getLocalData, getLocalDataByKeyPath, DB_NAME_CATCONFIG, DB_NAME_PROJ, STORE_NAME_PROJ } from 'assets/js/idbUtil'
     import { createNamespacedHelpers } from 'vuex'
     import { copyList } from 'assets/js/util'
     const { mapMutations, mapGetters } = createNamespacedHelpers('newProj')
@@ -147,7 +147,7 @@
         },
         computed:{
             type: function() {
-                return this.$route.query.type || '';
+                return this.$route.query.type || 0;
             },
             id: function() {
                 return this.$route.query.id || 0;
@@ -163,15 +163,75 @@
                 'projtype'
             ])
         },
-        async created () {
+<<<<<<< HEAD
+        async mounted () {
+=======
+        watch: {
+            selectedCats () {
+                // console.log('sum total time')
+                this.setSelectedCatsShare(this.selectedCats);
+                this.sumTotatTime();
+            }
+        },
+        async mounted () {
+            // regist refresh event
+
+
+>>>>>>> 9ca7893138efeae51b4bf3c07da9ee7ebf6de14e
 
             const vm = this;
+
 
             if (!vm.type && !vm.id) {
                 vm.$router.replace({path:'/chooseType'});
             }
 
-            this.setProjtype(vm);
+            if (vm.id){
+                console.log(vm.catTree);
+                // if (!vm.catTree.length) {
+                    const dbPromise = await createIndexedDB(DB_NAME_PROJ, STORE_NAME_PROJ);
+                    let proj = await getLocalDataByKeyPath(dbPromise, STORE_NAME_PROJ, vm.id) || {};
+                    dbPromise.close();
+                    console.log(`isSaved=${proj.isSaved}`);
+
+                    if (!('isSaved' in proj)){
+                        await axios.get(`/projects/${vm.id}`).then(res=>{
+                            const data = res.data;
+                            proj = data;
+                        }).catch(async err=>{
+                            // get data from indexdb
+                            console.log(`Network err: ${err}`);
+                        });
+                    }
+                    console.log(`projtype=${proj.projtype}`);
+                    if (typeof proj.projtype === 'object') {
+                        vm.setProjtype(proj.projtype.id);
+                    }else{
+                        vm.setProjtype(proj.projtype);
+                    }
+
+                    console.log(`timetotal = ${proj.timeTotal}`);
+                    // vm.type = proj.projtype.id;
+                    // console.log(`proj.projtype.id=${proj.projtype.id}`);
+                    // console.log(`type=${vm.type}`);
+                    vm.setCatList(proj.projhistorycats);
+                    vm.convertToCatTree(proj.projhistorycats);
+                    vm.setProjNameShare(proj);
+                    vm.setDescriptionShare(proj);
+                    vm.getSelectedCatsShare();
+                    vm.setTimeTotal(proj.timeTotal);
+
+                // }
+            }
+
+            // preview page: saving a proj need projtype
+            // console.log(`tyep=${vm.type}`);
+            console.log(`this.type=${this.type}`);
+            if (this.type) {
+                vm.setProjtype(this.type);
+            }
+
+            console.log(`Projtype=${this.projtype}`)
 
             if (vm.projNameShare) {
                 vm.projName = vm.projNameShare;
@@ -186,7 +246,9 @@
                 vm.selectedCats = vm.selectedCatsShare;
             }
 
-            if (!vm.catList.length && vm.type) {
+            // when first load detail page
+            console.log(vm.catList.length);
+            if (vm.type) {
 
                 let CURRENT_VERSION = await vm.getDbVersion() || 1;
 
@@ -214,12 +276,6 @@
             }
 
         },
-        watch: {
-            selectedCats () {
-                this.setSelectedCatsShare(this.selectedCats);
-                this.sumTotatTime();
-            }
-        },
         methods: {
             ...mapMutations ([
                 'setProjNameShare',
@@ -234,6 +290,7 @@
                 'setCheckedCatsTree',
                 'convertToCatTree',
                 'convertCheckedCatTree',
+                'getSelectedCatsShare',
                 'initData',
                 'setProjtype'
             ]),
@@ -268,6 +325,7 @@
                 vm.setCheckedCatsTree(copyCatTree);
             },
             changeTimeCost (cat, parentIndex, childIndex) {
+
                 this.parentIndex = parentIndex;
                 this.childIndex = childIndex;
                 this.timeCostDialog = true;
@@ -298,15 +356,21 @@
             sumTotatTime () {
                 const vm = this;
                 vm.setTimeTotal(0);
+                // console.log('vm.selectedCats');
+                // console.log(vm.selectedCats);
                 for (let i = 0; i < vm.selectedCats.length; i++) {
                     for (let cat of vm.catList) {
+                        console.log(cat.category);
                         if (cat.category) {
                             if (cat.category.id === vm.selectedCats[i]) {
                                 vm.calculateTimeTotal(cat.category.timeCost);
                                 break;
                             }
                         } else {
-                            if (cat.id === vm.selectedCats[i]) {
+                            // console.log(cat.id);
+                            // console.log(vm.selectedCats[i]);
+                            if (cat.id === vm.selectedCats[i] || cat.catId === vm.selectedCats[i]) {
+                                console.log(cat.timeCost);
                                 vm.calculateTimeTotal(cat.timeCost);
                                 break;
                             }
@@ -315,6 +379,8 @@
                 }
             },
             preview () {
+                console.log(`description = ${this.description}`);
+                // 更新indexDB
                 this.setProjNameShare(this);
                 this.setDescriptionShare(this);
                 this.setSelectedCatsShare(this.selectedCats);

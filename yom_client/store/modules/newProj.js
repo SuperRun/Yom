@@ -27,7 +27,7 @@ const getters = {
 }
 
 const mutations = {
-    setProjtype: (state, payload) => (state.projtype = payload.type),
+    setProjtype: (state, val) => (state.projtype = val),
     setProjNameShare: (state, payload) => (state.projNameShare = payload.projName),
     setDescriptionShare: (state, payload) => (state.descriptionShare = payload.description),
     setSelectedCatsShare: (state, selectedCats) => (state.selectedCatsShare = selectedCats),
@@ -103,7 +103,6 @@ const mutations = {
         }
     },
     convertCheckedCatTree(state){
-
         let copyCatTree = copyList(state.catTree);
         for (let copyCat of copyCatTree){
             copyCat.childNodes = copyList(copyCat.childNodes);
@@ -130,14 +129,20 @@ const mutations = {
                 i++;
             }
         }
-        console.log('copyCatTree');
-        console.log(copyCatTree);
-        state.checkedCatsTree = copyCatTree;
+        state.checkedCatsTree = copyList(copyCatTree);
     },
     updateCatList(state){
         state.catList.map(cat =>{
             state.selectedCatsShare.find(selectedCat => (cat.id?selectedCat === cat.id:selectedCat === cat.catId))?cat.isChecked=1:cat.isChecked=0;
         })
+    },
+    getSelectedCatsShare(state){
+        let selectedCats = state.catList.map(cat=> {
+            if(cat.isChecked && cat.parentId){
+                return cat.id?cat.id:cat.catId;
+            }
+        }).filter(cat=>cat);
+        state.selectedCatsShare = selectedCats;
     }
 }
 

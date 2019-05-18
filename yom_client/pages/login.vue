@@ -52,7 +52,7 @@
 <script>
   const Cookie = process.client ? require('js-cookie') : undefined
   import Strapi from 'strapi-sdk-javascript/build/main'
-  const apiUrl = 'https://strapiserver.herokuapp.com/'
+  const apiUrl =  'https://strapiserver.herokuapp.com/'
   const strapi = new Strapi(apiUrl)
 
 

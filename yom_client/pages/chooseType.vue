@@ -40,7 +40,7 @@
                 typeList: []
             }
         },
-        async created(){
+        async mounted(){
 
             const vm = this;
             const dbPromise = await createIndexedDB(DB_NAME_TYPE, STORE_NAME_TYPE);

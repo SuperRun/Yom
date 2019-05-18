@@ -1,5 +1,5 @@
-<template>
-    <v-container color="grey lighten-5">
+<template >
+    <v-container color="grey lighten-5 " id='x'>
 
         <v-layout color="white"
                   column
@@ -8,7 +8,7 @@
             <v-flex class="font-weight-medium"
                     align-self-center
                     mb-3>
-                <h1>{{projNameShare || 'No project name'}}</h1>
+                <h1 id="name">{{projNameShare || 'No project name'}}</h1>
             </v-flex>
             <v-flex>
                 <div>
@@ -51,6 +51,8 @@
                        :to="`/detail?id=${id}`">Edit</v-btn>
                 <v-btn class="themeColor btn white--text mx-auto"
                        @click="validateProjName">Save</v-btn>
+				<v-btn class="themeColor btn white--text mx-auto"
+                        @click="saveasimage" >GENERATE PICTURE</v-btn>
             </v-flex>
         </v-layout>
 
@@ -160,8 +162,12 @@
 </template>
 
 <script>
+	import $ from 'jquery'
+	import jquery from 'jquery'
+	import domtoimage from 'dom-to-image'
+	import { saveAs } from 'file-saver';
     import { createNamespacedHelpers } from 'vuex'
-    import { createIndexedDB, addDataLocally, updateProj, DB_NAME_PROJ, STORE_NAME_PROJ } from 'assets/js/idbUtil'
+    import { createIndexedDB, addDataLocally, updateProj, getLocalDataByKeyPath, DB_NAME_PROJ, STORE_NAME_PROJ } from 'assets/js/idbUtil'
     import { getNowFormatDate } from 'assets/js/util'
     import axios from '~/plugins/axios'
     const { mapGetters, mapMutations } = createNamespacedHelpers('newProj')
@@ -195,18 +201,76 @@
                 'projtype'
             ])
         },
-        created (){
-            console.log(this.$route);
-            if(this.id){
+<<<<<<< HEAD
+        // async fetch ({ store, query }) {
+        //     // let { data } = await axios.get(`/projects/${query.id}`);
+        //     // store.commit('newProj/setCatList', data.projhistorycats);
+        //     // store.commit('newProj/convertToCatTree', data.projhistorycats);
+        //     // store.commit('newProj/setProjNameShare', data);
+        //     // store.commit('newProj/setDescriptionShare', data);
+        //     // store.commit('newProj/setTimeTotal', data.timeTotal);
+        //     // store.commit('newProj/getSelectedCatsShare');
+        //     // store.commit('newProj/convertCheckedCatTree');
+        // },
+        async mounted(){
+            let { data } = await axios.get(`/projects/${this.id}`);
+            this.setCatList(data.projhistorycats);
+            this.convertToCatTree(data.projhistorycats);
+            this.setProjNameShare(data);
+            this.setDescriptionShare(data);
+            this.setTimeTotal(data.timeTotal);
+            this.getSelectedCatsShare();
+            this.convertCheckedCatTree();
+=======
+        created(){
+            console.log('created');
+        },
+        async mounted (){
+            console.log('mounted');
+            console.log(this.catTree);
+            if(this.id && !this.catTree.length){
+                console.log('not from detail page');
                 this.isSave = false;
-                console.log(this.$route.query.id);
+                const dbPromise = await createIndexedDB(DB_NAME_PROJ, STORE_NAME_PROJ);
+                let proj = await getLocalDataByKeyPath(dbPromise, STORE_NAME_PROJ, this.id) || {};
+                dbPromise.close();
+
+                if (!proj.hasOwnProperty('isSaved')){
+                    await axios.get(`/projects/${this.id}`).then(res=>{
+                        const data = res.data;
+                        proj = data;
+                    }).catch(async err=>{
+                        // get data from indexdb
+                        console.log(`Network err: ${err}`);
+                    });
+                }
+                // this.type = proj.projtype.id;
+                console.log(proj);
+                if (Object.keys(proj).length !== 0) {
+                    this.setCatList(proj.projhistorycats);
+                    this.convertToCatTree(proj.projhistorycats);
+                    this.setProjNameShare(proj);
+                    this.setDescriptionShare(proj);
+                    this.setTimeTotal(proj.timeTotal);
+                    this.getSelectedCatsShare();
+                    this.convertCheckedCatTree();
+                }
+
             }
+>>>>>>> 9ca7893138efeae51b4bf3c07da9ee7ebf6de14e
         },
         methods:{
             ...mapMutations ([
                 'setProjNameShare',
                 'initData',
-                'updateCatList'
+                'updateCatList',
+                'setCatList',
+                'convertToCatTree',
+                'setDescriptionShare',
+                'setTimeTotal',
+                'convertCheckedCatTree',
+                'setSelectedCatsShare',
+                'getSelectedCatsShare'
             ]),
             edit(){
                 this.isSave = true;
@@ -259,7 +323,8 @@
 
                 const dbPromise = await createIndexedDB(DB_NAME_PROJ, STORE_NAME_PROJ);
                 const projId = await addDataLocally(dbPromise, STORE_NAME_PROJ, newProj);
-                dbPromise.close();
+
+                console.log(`save projtype = ${projtype}`);
 
                 await axios({
                     method: 'post',
@@ -269,11 +334,18 @@
                         'Content-Type': 'application/json',
                         'X-Mark-Id': projId
                     }
-                }).then(res=>{
+                }).then(async res=>{
+                    // 保存成功更改indexdb中的id
                     console.log(`Save a project succeed:${res}`);
+                    if (projId !== res.data.projId){
+                        await updateProj(dbPromise, projId, {id: res.data.projId, isSaved: true});
+                    }
                 }).catch(async err => {
+                    // 保存失败增加isSaved: false  传入的id与重新编辑的更新做区别
                     console.log(`Save a project failed:${err}`);
+                    await updateProj(dbPromise, projId, {id: projId, isSaved: false});
                 }).finally(()=>{
+                    dbPromise.close();
                     setTimeout(() => {
                         vm.savingDialog = false;
                         vm.initData();
@@ -295,6 +367,8 @@
                     projhistorycats: catList,
                     user: this.$store.state.auth.id
                 };
+                console.log('editProj');
+                console.log(editProj);
                 const dbPromise = await createIndexedDB(DB_NAME_PROJ, STORE_NAME_PROJ, 1);
                 await updateProj(dbPromise, id, editProj);
                 dbPromise.close();
@@ -313,10 +387,16 @@
                             'Content-Type': 'application/json',
                             'X-Mark-Id': id
                         }
-                    }).then(res=>{
+                    }).then(async res=>{
+                        // 保存成功更改indexdb中的id
                         console.log(`Save a project succeed:${res}`);
+                        if (projId !== res.data.projId){
+                            await updateProj(dbPromise, id, {id: res.data.projId, isSaved: true});
+                        }
                     }).catch(async err => {
+                        // 更新失败增加isSaved: false  传入的id与重新编辑的更新做区别
                         console.log(`Save a project failed:${err}`);
+                        // await updateProj(dbPromise, id, {id: projId, isSaved: false});
                     }).finally(()=>{
                         setTimeout(() => {
                             vm.savingDialog = false;
@@ -369,6 +449,35 @@
                     }, 1000);
                 });
             },
+			saveasimage(){
+				var date = new Date();
+				var seperator1 = "-";
+				var seperator2 = "_";
+				var month = date.getMonth() + 1;
+				var strDate = date.getDate();
+				if (month >= 1 && month <= 9) {
+					month = "0" + month;
+				}
+				if (strDate >= 0 && strDate <= 9) {
+					strDate = "0" + strDate;
+				}
+				var currentdate = date.getFullYear() + seperator1 + month + seperator1 + strDate
+					+ " " + date.getHours() + seperator2 + date.getMinutes()
+					+ seperator2 + date.getSeconds();
+				var node = document.getElementById('x');
+				var name = "projname_" + $('h1').text() + " time_" + currentdate;
+				domtoimage.toPng(node)
+					.then(function (dataUrl) {
+						var img = new Image();
+                        img.src = dataUrl;
+                        document.body.appendChild(img);
+                    });
+				domtoimage.toBlob(document.getElementById('x'),{ bgcolor:"white" })
+					.then(function (blob) {
+						window.saveAs(blob,name);
+					});
+				alert("picture saved as " + name + ".png,you can see the picture below")
+			},	
         }
     }
 </script>

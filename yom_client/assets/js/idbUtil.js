@@ -9,36 +9,36 @@ const STORE_NAME_CATCONFIG = "configcats";
 const STORE_NAME_PROJ = "projects";
 
 async function createIndexedDB(dbName, storeName, version=1) {
-    if (process.client) {
-        if (!('indexedDB' in window)) {
-            return null;
-        }
-        return await openDB(dbName, version, {
-            upgrade(db) {
-
-                console.log(`version=${version}`);
-
-                console.log(`storeName=${storeName}`);
-
-                if (!db.objectStoreNames.contains(storeName)) {
-
-                    const store = db.createObjectStore(storeName, {
-                        keyPath: 'id',
-                        autoIncrement: true
-
-                    });
-
-                    if (storeName == 'projects') {
-                        console.log('create a index');
-                        store.createIndex('createdAtIndex', 'created_at', {unique: false});
-                        store.createIndex('projNameIndex', 'projName', {unique: false});
-                    }
-                }
-
-
-            }
-        });
+    // if (process.client) {
+    if (!('indexedDB' in window)) {
+        return null;
     }
+    return await openDB(dbName, version, {
+        upgrade(db) {
+
+            console.log(`version=${version}`);
+
+            console.log(`storeName=${storeName}`);
+
+            if (!db.objectStoreNames.contains(storeName)) {
+
+                const store = db.createObjectStore(storeName, {
+                    keyPath: 'id',
+                    autoIncrement: true
+
+                });
+
+                if (storeName == 'projects') {
+                    console.log('create a index');
+                    store.createIndex('createdAtIndex', 'created_at', {unique: false});
+                    store.createIndex('projNameIndex', 'projName', {unique: false});
+                }
+            }
+
+
+        }
+    });
+    // }
 
 }
 
@@ -83,29 +83,66 @@ function fetchApi(url , method, data, markId = '') {
     });
 }
 
-async function getLocalData(db, storeName) {
-    return await db.getAll(storeName);
+function getLocalData(db, storeName) {
+    return db.getAll(storeName);
+}
+async function getLocalDataCount(db, storeName) {
+    return await db.count(storeName);
+}
+async function getLocalDataByKeyPath(db, storeName, val) {
+    // console.log(`projId=${val}`);
+    // console.log(`storeName=${storeName}`);
+    // const value = await db.get(storeName, 139);
+    // console.log(value);
+    return await db.get(storeName, parseInt(val));
 }
 
-async function updateProj(db, id, proj){
+async function updateProj(db, id, val){
     const tx = db.transaction('projects','readwrite');
     const store= tx.store;
     let cursor = await store.openCursor();
-    console.log('id',typeof id);
+    console.log('id',id);
     while(cursor){
         console.log('key',typeof cursor.key);
         console.log(cursor.key === parseInt(id));
         if (cursor.key === parseInt(id)){
             // cursor.value = proj;
-            Object.assign(proj, {
-                id: parseInt(id),
-                created_at: cursor.value.created_at
-            });
-            console.log(proj);
-            const request = cursor.update(proj);
-            request.onsuccess = function() {
-                console.log(`update success`);
-            };
+            // if (typeof val === 'number'){
+            //     const proj = { ...cursor.value };
+            //     proj.id = val;
+            //     val = proj;
+            // } else{
+            //     Object.assign(val, {
+            //         id: parseInt(id),
+            //         created_at: cursor.value.created_at
+            //     });
+            // }
+            if (typeof val === 'object'){ 
+               
+                if (Object.keys(val).indexOf('id')=== -1){
+                    // 编辑项目后保持indexdb数据一致
+                    Object.assign(val, {
+                        id: parseInt(id),
+                        created_at: cursor.value.created_at
+                    });
+                } else {
+                    // 更改id值 isSaved的值
+                    const proj = { ...cursor.value };
+                    for(let [key,value] of Object.entries(val)){
+                        if (key === 'isSaved' && value){
+                            delete proj[key];
+                        }else{
+                            proj[key] = value;
+                        }
+                    }
+                    val =proj;
+                }
+
+            }
+
+            console.log(`val`);
+            console.log(val);
+            cursor.update(val);
             break;
         }
         cursor = await cursor.continue();
@@ -114,8 +151,14 @@ async function updateProj(db, id, proj){
 
 }
 
+<<<<<<< HEAD
+function getProjsByDate(db){
+   return db.getAllFromIndex('projects', 'createdAtIndex');
+=======
+
 async function getProjsByDate(db){
    return await db.getAllFromIndex('projects', 'createdAtIndex');
+>>>>>>> 9ca7893138efeae51b4bf3c07da9ee7ebf6de14e
 }
 
 async function searchProjs(db, query){
@@ -156,10 +199,12 @@ export {
     saveDataLocally,
     getLocalData,
     getProjsByDate,
+    getLocalDataCount,
     searchProjs,
     setLastUpdated,
     addDataLocally,
     updateProj,
+    getLocalDataByKeyPath,
     DB_NAME_TYPE,
     DB_NAME_CATCONFIG,
     DB_NAME_PROJ,

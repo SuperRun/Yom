@@ -1,5 +1,4 @@
 importScripts('https://cdn.jsdelivr.net/npm/workbox-cdn@4.1.1/workbox/workbox-sw.js')
-
 // --------------------------------------------------
 // Configure
 // --------------------------------------------------
@@ -13,7 +12,7 @@ workbox.setConfig({
 workbox.core.clientsClaim()
 
 // Skip over the SW waiting lifecycle stage
-// workbox.core.skipWaiting()
+workbox.core.skipWaiting()
 
 workbox.precaching.cleanupOutdatedCaches()
 
@@ -26,7 +25,6 @@ workbox.precaching.precacheAndRoute([]);
 // --------------------------------------------------
 // Runtime Caching
 // --------------------------------------------------
-
 
 // background sync
 
@@ -46,7 +44,7 @@ if (workbox) {
             let savedProjId = [];
             let entry;
             console.log('background sync');
-            while (entry = await queue.shiftRequest()) {
+            while (entry = await queue.popRequest()) {
                 const markId = entry.request.headers.get('X-Mark-Id');
                 try {
                     if (savedProjId.indexOf(markId) ===-1){
@@ -74,8 +72,7 @@ if (workbox) {
     });
 
     const baseUrl = 'https://strapiserver.herokuapp.com';
-
-    console.log(baseUrl);
+     // const baseUrl = 'http://localhost:1337';
 
     workbox.routing.registerRoute(
         new RegExp(`${baseUrl}/projects`),
@@ -89,14 +86,19 @@ if (workbox) {
         'PUT'
     );
 
-    // workbox.routing.registerRoute(
-    //     /http:\/\/localhost:1337\/projhistorycats/,
-    //     networkWithBackgroundSyncForUpdate,
-    //     'PUT'
-    // );
+<<<<<<< HEAD
 
     workbox.routing.registerRoute(new RegExp('/_nuxt/(?!.*(__webpack_hmr|hot-update))'), new workbox.strategies.CacheFirst ({}), 'GET')
-    workbox.routing.registerRoute(new RegExp('/(?!.*(__webpack_hmr|hot-update))'), new workbox.strategies.NetworkFirst ({}), 'GET')
+    // workbox.routing.registerRoute(new RegExp('/(?!.*(__webpack_hmr|hot-update))'), new workbox.strategies.NetworkFirst ({}), 'GET')
+=======
+
+    // workbox.routing.registerRoute(/\/_nuxt\/.*/, workbox.strategies.cacheFirst());
+    // workbox.routing.registerRoute(/\/.*/, workbox.strategies.networkFirst());
+
+    workbox.routing.registerRoute(new RegExp('/_nuxt/(?!.*(__webpack_hmr|hot-update))'), new workbox.strategies.CacheFirst ({}), 'GET')
+    workbox.routing.registerRoute(/\/.*/, new workbox.strategies.NetworkFirst({}), 'GET');
+    // workbox.routing.registerRoute(new RegExp('http://localhost:3000/chooseType'), new workbox.strategies.NetworkFirst ({}), 'GET')
+>>>>>>> 9ca7893138efeae51b4bf3c07da9ee7ebf6de14e
 
 } else {
     console.log(`Boo! Workbox didn't load 😬`);
