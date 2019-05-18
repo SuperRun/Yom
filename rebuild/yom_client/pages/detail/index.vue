@@ -24,7 +24,7 @@
 
     export default {
         layout: 'common',
-        // middleware: 'authenticated',
+        middleware: 'authenticated',
         components: {
             BasicInfo,
             ProjCats,

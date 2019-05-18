@@ -42,7 +42,7 @@
     const Cookie = process.client ? require('js-cookie') : undefined
 
     export default {
-        // middleware: 'authenticated',
+        middleware: 'authenticated',
         data(){
             return {
                 title: "YOM"
@@ -54,7 +54,7 @@
                 console.log('66666');
                 Cookie.remove('auth');
                 this.$store.commit('auth/setAuth', null);
-                this.$router.push(`/login`)
+                this.$router.push('/')
                 this.$router.go(0)
             },
         }

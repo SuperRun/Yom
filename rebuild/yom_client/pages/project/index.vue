@@ -24,7 +24,7 @@
     export default {
         name: "project",
         layout: "common",
-        // middleware: 'authenticated',
+        middleware: 'authenticated',
         components: {
             ProjItem
         },

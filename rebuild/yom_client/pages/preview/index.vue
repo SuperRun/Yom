@@ -37,7 +37,7 @@
     export default {
         name: "preview",
         layout: 'common',
-        // middleware: 'authenticated',
+        middleware: 'authenticated',
         components: {
             ProjDoc,
             FillDialog,

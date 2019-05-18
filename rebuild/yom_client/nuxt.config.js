@@ -58,13 +58,14 @@ export default {
     // Doc: https://axios.nuxtjs.org/usage
     '@nuxtjs/axios',
     '@nuxtjs/pwa',
+    '@nuxtjs/onesignal',
   ],
   /*
   ** Axios module configuration
   */
   axios: {
     // See https://github.com/nuxt-community/axios-module#options
-      baseURL: 'http://localhost:1337'
+      baseURL: 'https://strapiserver.herokuapp.com'
   },
   workbox: {
       // Workbox options
@@ -72,7 +73,15 @@ export default {
       config: { modulePathPrefix: '/workbox-v4.3.1' },
       cachingExtensions: '@/plugins/background-sync.js'
   },
-
+  oneSignal: {
+    init: {
+        appId: '02440743-6079-4840-b62b-d4213d2989c0',
+        allowLocalhostAsSecureOrigin: true,
+        welcomeNotification: {
+            disable: true
+        }
+    }
+  },
   /*
   ** Build configuration
   */

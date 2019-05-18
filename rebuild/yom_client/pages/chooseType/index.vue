@@ -14,7 +14,7 @@
     export default {
         name: "chooseType",
         layout: 'common',
-        // middleware: 'authenticated',
+        middleware: 'authenticated',
         components: {
             TypeItem
         },
