@@ -96,6 +96,7 @@ async function getLocalDataByKeyPath(db, storeName, val) {
     // console.log(value);
     return await db.get(storeName, parseInt(val));
 }
+async function getLocalDataCount(db, storeName) {
     return await db.count(storeName);
 }
 async function getLocalDataByKeyPath(db, storeName, val) {
