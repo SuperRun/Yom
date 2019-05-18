@@ -163,9 +163,6 @@
                 'projtype'
             ])
         },
-<<<<<<< HEAD
-        async mounted () {
-=======
         watch: {
             selectedCats () {
                 // console.log('sum total time')
@@ -175,9 +172,6 @@
         },
         async mounted () {
             // regist refresh event
-
-
->>>>>>> 9ca7893138efeae51b4bf3c07da9ee7ebf6de14e
 
             const vm = this;
 

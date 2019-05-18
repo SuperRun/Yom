@@ -43,11 +43,6 @@ export default {
   plugins: [
     '@/plugins/vuetify',
     '@/plugins/axios',
-<<<<<<< HEAD
-    { src: '~/plugins/regist-sw.js', ssr: false},
-    { src: '~/plugins/easyRefresh.js', ssr: false},
-    { src: '~plugins/ga.js', ssr: false }
-=======
     // {
     //     src: '~/plugins/regist-sw.js',
     //     ssr: false
@@ -56,8 +51,6 @@ export default {
         src: '~/plugins/easyRefresh.js',
         ssr: false
     }
-
->>>>>>> 9ca7893138efeae51b4bf3c07da9ee7ebf6de14e
   ],
 
   /*

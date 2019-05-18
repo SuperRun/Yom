@@ -96,6 +96,15 @@ async function getLocalDataByKeyPath(db, storeName, val) {
     // console.log(value);
     return await db.get(storeName, parseInt(val));
 }
+    return await db.count(storeName);
+}
+async function getLocalDataByKeyPath(db, storeName, val) {
+    // console.log(`projId=${val}`);
+    // console.log(`storeName=${storeName}`);
+    // const value = await db.get(storeName, 139);
+    // console.log(value);
+    return await db.get(storeName, parseInt(val));
+}
 
 async function updateProj(db, id, val){
     const tx = db.transaction('projects','readwrite');
@@ -151,14 +160,9 @@ async function updateProj(db, id, val){
 
 }
 
-<<<<<<< HEAD
-function getProjsByDate(db){
-   return db.getAllFromIndex('projects', 'createdAtIndex');
-=======
 
 async function getProjsByDate(db){
    return await db.getAllFromIndex('projects', 'createdAtIndex');
->>>>>>> 9ca7893138efeae51b4bf3c07da9ee7ebf6de14e
 }
 
 async function searchProjs(db, query){

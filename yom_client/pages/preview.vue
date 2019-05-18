@@ -201,17 +201,7 @@
                 'projtype'
             ])
         },
-<<<<<<< HEAD
-        // async fetch ({ store, query }) {
-        //     // let { data } = await axios.get(`/projects/${query.id}`);
-        //     // store.commit('newProj/setCatList', data.projhistorycats);
-        //     // store.commit('newProj/convertToCatTree', data.projhistorycats);
-        //     // store.commit('newProj/setProjNameShare', data);
-        //     // store.commit('newProj/setDescriptionShare', data);
-        //     // store.commit('newProj/setTimeTotal', data.timeTotal);
-        //     // store.commit('newProj/getSelectedCatsShare');
-        //     // store.commit('newProj/convertCheckedCatTree');
-        // },
+
         async mounted(){
             let { data } = await axios.get(`/projects/${this.id}`);
             this.setCatList(data.projhistorycats);
@@ -221,7 +211,7 @@
             this.setTimeTotal(data.timeTotal);
             this.getSelectedCatsShare();
             this.convertCheckedCatTree();
-=======
+        },
         created(){
             console.log('created');
         },
@@ -257,7 +247,6 @@
                 }
 
             }
->>>>>>> 9ca7893138efeae51b4bf3c07da9ee7ebf6de14e
         },
         methods:{
             ...mapMutations ([

@@ -14,11 +14,7 @@
                                   pa-2
                                   pl-3
                                   class="white elevation-3"
-<<<<<<< HEAD
                                   @click="edit(proj.id)">
-=======
-                                  @click="edit(proj)">
->>>>>>> 9ca7893138efeae51b4bf3c07da9ee7ebf6de14e
                             <v-flex xs3>
                                 <h3 v-bind:class="[itemColorText[index%itemColorText.length],'display-1', 'font-weight-bold']">
                                     {{proj.created_at.split('T')[0].split('-')[2]}}
@@ -33,13 +29,8 @@
                     </v-timeline-item>
                 </v-timeline>
                 <div class="title
-<<<<<<< HEAD
                      grey--text
                      text-lighten-1"
-=======
-                 grey--text
-                 text-lighten-1"
->>>>>>> 9ca7893138efeae51b4bf3c07da9ee7ebf6de14e
                      mt-5
                      v-if="!projects.length">There is no project.</div>
             </v-container>
@@ -146,7 +137,6 @@
                 'convertCheckedCatTree',
                 'initData'
             ]),
-<<<<<<< HEAD
             edit (id) {
                 console.log(`proj${id}`);
                 this.setCatList(proj.projhistorycats);
@@ -163,12 +153,6 @@
                 console.log('checkedCatsTree');
                 console.log(this.checkedCatsTree);
                 this.$router.push(`/preview?id=${id}`);
-=======
-            edit (proj) {
-                console.log(proj);
-                this.initData();// 避免每次编辑的数据都一样
-                this.$router.push(`/preview?id=${proj.id}`);
->>>>>>> 9ca7893138efeae51b4bf3c07da9ee7ebf6de14e
             },
             async loadMore(done){
                 console.log(`page = ${this.page}; cont/limit = ${Math.ceil(this.count/this.limit)}`);
