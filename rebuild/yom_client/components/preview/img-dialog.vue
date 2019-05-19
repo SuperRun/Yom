@@ -9,6 +9,7 @@
 
             <v-card-text>
                 Do you want to generate the project as a picture?
+				See the picture below
             </v-card-text>
 
             <v-card-actions>
@@ -73,7 +74,7 @@
                        img.src = dataUrl;
                        document.body.appendChild(img);
                    });
-               domtoimage.toBlob(this.doc)
+               domtoimage.toBlob(this.doc,{ bgcolor:"white" })
                    .then(function (blob) {
                        window.saveAs(blob,name);
                    });
