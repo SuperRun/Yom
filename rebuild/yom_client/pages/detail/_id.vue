@@ -76,6 +76,7 @@
                 store.commit('newProj/setProjNameShare', project.projName);
                 store.commit('newProj/setDescriptionShare', project.description);
                 store.commit('newProj/setTimeTotal', project.timeTotal);
+                store.commit('newProj/setProjtype', project.projtype);
                 store.commit('newProj/getSelectedCatsShare');
                 store.commit('newProj/convertCheckedCatTree');
             }
@@ -96,6 +97,7 @@
                         this.setProjNameShare(this.project.projName);
                         this.setDescriptionShare(this.project.description);
                         this.setTimeTotal(this.project.timeTotal);
+                        this.setProjtype(this.project.projtype);
                         this.getSelectedCatsShare();
                         this.convertCheckedCatTree();
                     }else{
@@ -116,7 +118,8 @@
                 'setDescriptionShare',
                 'setTimeTotal',
                 'getSelectedCatsShare',
-                'convertCheckedCatTree'
+                'convertCheckedCatTree',
+                'setProjtype'
             ])
 
         }

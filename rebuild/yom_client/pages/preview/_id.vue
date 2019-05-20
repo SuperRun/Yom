@@ -40,6 +40,7 @@
 
     export default {
         layout: 'common',
+        middleware: 'authenticated',
         components: {
             ProjDoc,
             FillDialog,
@@ -98,6 +99,7 @@
                 store.commit('newProj/setProjNameShare', project.projName);
                 store.commit('newProj/setDescriptionShare', project.description);
                 store.commit('newProj/setTimeTotal', project.timeTotal);
+                store.commit('newProj/setProjtype', project.projtype);
                 store.commit('newProj/getSelectedCatsShare');
                 store.commit('newProj/convertCheckedCatTree');
             }
@@ -105,7 +107,7 @@
             return { project };
         },
         async mounted(){
-            console.log('mounted', this.project);
+            console.log('mounted-start', this.project);
             if (!this.project.isEdit){
                 if (!Object.keys(this.project).length){
                     // get project from indexdb
@@ -118,6 +120,7 @@
                         this.setProjNameShare(this.project.projName);
                         this.setDescriptionShare(this.project.description);
                         this.setTimeTotal(this.project.timeTotal);
+                        this.setProjtype(this.project.projtype);
                         this.getSelectedCatsShare();
                         this.convertCheckedCatTree();
                     }else{
@@ -125,7 +128,7 @@
                     }
                 }
             }
-
+            console.log('mounted-end', this.project);
 
         },
         methods: {
@@ -136,7 +139,8 @@
                 'setDescriptionShare',
                 'setTimeTotal',
                 'getSelectedCatsShare',
-                'convertCheckedCatTree'
+                'convertCheckedCatTree',
+                'setProjtype'
             ])
         }
 

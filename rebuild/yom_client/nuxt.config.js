@@ -65,7 +65,7 @@ export default {
   */
   axios: {
     // See https://github.com/nuxt-community/axios-module#options
-      baseURL: 'https://strapiserver.herokuapp.com'
+      baseURL: 'https://strapiserver.herokuapp.com' // 'http://localhost:1337'
   },
   workbox: {
       // Workbox options
@@ -100,6 +100,6 @@ export default {
     }
   },
   env: {
-    baseUrl: process.env.BASE_URL || 'https://strapiserver.herokuapp.com' // 'http://localhost:1337'
+    baseUrl: process.env.BASE_URL || 'http://localhost:1337' // 'https://strapiserver.herokuapp.com'
   }
 }

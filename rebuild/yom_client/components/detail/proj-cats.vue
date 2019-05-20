@@ -68,6 +68,7 @@
         },
         watch:{
             selectedCats () {
+                console.log('wathcing selectedCats...',this.selectedCats);
                 this.setSelectedCatsShare(this.selectedCats);
                 this.sumTotatTime();
             },
@@ -111,7 +112,7 @@
                                 break;
                             }
                         } else {
-                            if (cat.id === vm.selectedCats[i]) {
+                            if (cat.id === vm.selectedCats[i] || cat.catId === vm.selectedCats[i]) {
                                 vm.calculateTimeTotal(cat.timeCost);
                                 break;
                             }
@@ -125,7 +126,8 @@
                     parentIndex,
                     childIndex,
                     slider: cat.category ? cat.category.timeCost : cat.timeCost,
-                    changedCatId: cat.id
+                    changedCatId: cat.id,
+                    comment: cat.category ? cat.category.comment : cat.comment
                 }
 
                 this.setChangeTimeCostOptions(options)

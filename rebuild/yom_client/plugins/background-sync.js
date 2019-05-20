@@ -23,7 +23,7 @@ const bgSyncPluginForCreate = new workbox.backgroundSync.Plugin('projects-create
 const bgSyncPluginForUpdate = new workbox.backgroundSync.Plugin('projects-update-queue');
 
 
-
+// 'http://localhost:1337'
 const baseUrl = 'https://strapiserver.herokuapp.com';
 
 const networkWithBackgroundSyncForCreate = new workbox.strategies.NetworkOnly({

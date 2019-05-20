@@ -185,6 +185,7 @@
                 return projhistorycats;
             },
             async updateProjFromIdb(id){
+                console.log('editProj', this.editProj);
                 await this.$axios({
                     method: 'post',
                     url: '/projects',

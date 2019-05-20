@@ -53,7 +53,9 @@
         },
         mounted(){
             this.slider= this.$store.state.newProj.changeTimeCostOptions.slider;
-            console.log(this.slider);
+            this.comment = this.$store.state.newProj.changeTimeCostOptions.comment;
+            console.log('slider', this.slider);
+            console.log('comment', this.comment);
         },
         methods:{
             saveTimeCost(){
@@ -68,14 +70,15 @@
                         comment: this.comment
                     }
                 })
-                console.log(options);
+                console.log('options', options);
 
                 if (options.parentIndex!=-1 && options.childIndex != -1) {
                     this.$store.commit('newProj/setCatTreeNode', options);
                     this.$store.commit('newProj/setCatListNode', options);
                     this.sumTotatTime();
                 }
-                console.log(this.$store.state.newProj.catTree);
+                console.log('catList', this.$store.state.newProj.catList);
+                console.log('catTree', this.$store.state.newProj.catTree);
                 this.comment='';
                 this.$emit('close-dialog', false);
             },

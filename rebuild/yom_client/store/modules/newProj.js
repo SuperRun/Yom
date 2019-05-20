@@ -55,11 +55,14 @@ const mutations = {
     setCatList: (state, catList) => (state.catList = catList),
     setCatListNode: (state, info) => {
         for (let cat of state.catList) {
-            if (cat.id === info.id){
+            if (cat.id === info.id || cat.catId === info.id){
+                console.log('info', info);
                 for (let key of Object.keys(info.objs)) {
+                    console.log(`cat start ${key}:`, cat[key]);
                     cat.category ? cat.category[key] = info.objs[key] : cat[key] = info.objs[key];
-                    break;
+                    console.log(`cat end ${key}:`, cat[key]);
                 }
+                break;
             }
         }
     },

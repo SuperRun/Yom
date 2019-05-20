@@ -45,7 +45,12 @@
         },
         methods: {
             goBack(){
-                this.$router.go(-1);
+                if (this.title === 'My Project') {
+                    this.$router.replace('/userStart');
+                }else{
+                    this.$router.go(-1);
+                }
+
             }
         }
     }
