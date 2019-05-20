@@ -9,7 +9,7 @@
 
             <v-card-text>
                 Do you want to generate the project as a picture?
-				See the picture below
+                See the picture below
             </v-card-text>
 
             <v-card-actions>
@@ -38,7 +38,10 @@
 
 <script>
     import $ from 'jquery'
-    import jsPDF from 'jspdf'
+    let jsPDF = null
+    if (process.client) {
+         jsPDF = require('jspdf')
+    }
     import domtoimage from 'dom-to-image'
 
     export default {

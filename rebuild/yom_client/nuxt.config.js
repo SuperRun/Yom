@@ -100,6 +100,6 @@ export default {
     }
   },
   env: {
-    baseUrl: process.env.BASE_URL || 'http://localhost:1337' // 'https://strapiserver.herokuapp.com'
-  }
+    baseUrl: process.env.BASE_URL || 'https://strapiserver.herokuapp.com'
+  } // 'http://localhost:1337'
 }

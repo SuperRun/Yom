@@ -49,7 +49,8 @@
                       align-center
                       justify-center
                       pb-2>
-                <v-btn class="themeColor btn white--text mx-auto" @click="preview">Preview</v-btn>
+                <v-btn class="themeColor btn white--text mx-auto"
+                       @click="preview">Preview</v-btn>
             </v-layout>
         </v-card>
     </v-flex>
