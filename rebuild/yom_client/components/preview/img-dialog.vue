@@ -38,8 +38,8 @@
 
 <script>
     import $ from 'jquery'
+    import jsPDF from 'jspdf'
     import domtoimage from 'dom-to-image'
-    import { saveAs } from 'file-saver';
 
     export default {
         data(){
@@ -68,15 +68,15 @@
                    + " " + date.getHours() + seperator2 + date.getMinutes()
                    + seperator2 + date.getSeconds();
                var name = "projname_" + $('h1').text() + " time_" + currentdate;
-               domtoimage.toPng(this.doc)
+			   var node = document.getElementById('pdf');
+               domtoimage.toPng(pdf)
                    .then(function (dataUrl) {
                        var img = new Image();
                        img.src = dataUrl;
                        document.body.appendChild(img);
-                   });
-               domtoimage.toBlob(this.doc,{ bgcolor:"white" })
-                   .then(function (blob) {
-                       window.saveAs(blob,name);
+					   var pdf = new jsPDF();
+                       pdf.addImage(dataUrl, 'PNG', 0, 0);
+                       pdf.save(name + ".pdf");
                    });
            }
         }
