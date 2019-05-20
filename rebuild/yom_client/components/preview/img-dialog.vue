@@ -72,13 +72,15 @@
                    + seperator2 + date.getSeconds();
                var name = "projname_" + $('h1').text() + " time_" + currentdate;
 			   var node = document.getElementById('pdf');
+			   var height = $("#pdf").height();
+			   var width = $("#pdf").width();
                domtoimage.toPng(pdf)
                    .then(function (dataUrl) {
                        var img = new Image();
                        img.src = dataUrl;
                        document.body.appendChild(img);
-					   var pdf = new jsPDF();
-                       pdf.addImage(dataUrl, 'PNG', 0, 0);
+					   var pdf = new jsPDF({ format: [width, height]});
+                       pdf.addImage(dataUrl, 'PNG', width/50, 0);
                        pdf.save(name + ".pdf");
                    });
            }
