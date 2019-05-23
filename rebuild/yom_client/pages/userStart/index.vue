@@ -12,7 +12,9 @@
                         Y.O.M
                     </v-flex>
                     <v-flex xs2>
-                        <v-btn icon @click="logout">
+                        <v-btn icon
+                               @click="logout"
+                                style="float: right">
                             <v-icon right color="#ffffff">power_settings_new</v-icon>
                         </v-btn>
                     </v-flex>
@@ -65,7 +67,7 @@
         width: 100%;
         height: 100%;
         background-image: url("/user/startpage.jpg");
-        background-size: contain;
+        background-size: cover;
         flex-direction:column;
         justify-content: space-between;
     }
