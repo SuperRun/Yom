@@ -14,7 +14,7 @@ const bgSyncPluginForCreate = new workbox.backgroundSync.Plugin('projects-create
                         if (Notification.permission === "granted") {
                             self.registration.showNotification('The project was created successfully!', {
                                 body: '🎉`🎉`🎉`'
-                            n});
+                            });
                         }
 
                     });
