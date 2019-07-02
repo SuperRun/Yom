@@ -37,9 +37,9 @@
 
 <script>
     import { createNamespacedHelpers } from 'vuex'
-    import { createIndexedDB, addDataLocally, updateProj, DB_NAME_PROJ, STORE_NAME_PROJ } from 'assets/js/idbUtil'
+    import { createIndexedDB, addDataLocally, updateProj, DB_NAME_PROJ, STORE_NAME_PROJ } from 'static/js/idbUtil'
     const { mapGetters, mapMutations } = createNamespacedHelpers('newProj')
-    import { getNowFormatDate } from 'assets/js/util'
+    import { getNowFormatDate } from 'static/js/util'
 
     export default {
         name: "tip-dialog",

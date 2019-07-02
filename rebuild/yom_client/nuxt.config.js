@@ -33,7 +33,8 @@ export default {
   ** Global CSS
   */
   css: [
-    '~/assets/style/app.styl'
+    '~/assets/style/app.styl',
+    '~/assets/style/main.css'
   ],
 
   /*
@@ -72,6 +73,9 @@ export default {
       // swURL: 'custom-sw.js',
       config: { modulePathPrefix: '/workbox-v4.3.1' },
       cachingExtensions: '@/plugins/background-sync.js'
+  },
+  manifest: {
+    start_url: "/"
   },
   oneSignal: {
     init: {

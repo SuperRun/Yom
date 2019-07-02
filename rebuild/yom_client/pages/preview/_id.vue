@@ -35,7 +35,7 @@
     import ImgDialog from '@/components/preview/img-dialog'
 
     import { createNamespacedHelpers } from 'vuex'
-    import { createIndexedDB, getLocalDataByKeyPath, DB_NAME_PROJ, STORE_NAME_PROJ } from 'assets/js/idbUtil'
+    import { createIndexedDB, getLocalDataByKeyPath, DB_NAME_PROJ, STORE_NAME_PROJ } from 'static/js/idbUtil'
     const { mapGetters, mapMutations } = createNamespacedHelpers('newProj')
 
     export default {

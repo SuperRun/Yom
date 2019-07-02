@@ -16,7 +16,6 @@
                 {{title}}
             </v-flex>
             <v-flex xs2>
-
             </v-flex>
         </v-layout>
         <Nuxt/>

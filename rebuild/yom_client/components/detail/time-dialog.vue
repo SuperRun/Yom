@@ -40,7 +40,7 @@
 </template>
 
 <script>
-    import { copyList } from 'assets/js/util'
+    import { copyList } from 'static/js/util'
 
     export default {
         name: "time-dialog",

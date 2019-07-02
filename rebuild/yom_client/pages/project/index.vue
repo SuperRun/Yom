@@ -18,7 +18,7 @@
 
 <script>
     import ProjItem from '@/components/project/proj-item'
-    import { createIndexedDB, saveDataLocally, searchProjs, STORE_NAME_PROJ, DB_NAME_PROJ } from 'assets/js/idbUtil'
+    import { createIndexedDB, saveDataLocally, searchProjs, STORE_NAME_PROJ, DB_NAME_PROJ } from 'static/js/idbUtil'
     import { createNamespacedHelpers } from 'vuex'
 
     export default {

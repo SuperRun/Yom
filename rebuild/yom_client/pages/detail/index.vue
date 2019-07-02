@@ -16,9 +16,9 @@
     import BasicInfo from '@/components/detail/basic-info'
     import ProjCats from '@/components/detail/proj-cats'
     import TimeDialog from '@/components/detail/time-dialog'
-    import { createIndexedDB, saveDataLocally, getLocalData, DB_NAME_CATCONFIG, STORE_NAME_CATCONFIG } from 'assets/js/idbUtil'
+    import { createIndexedDB, saveDataLocally, getLocalData, DB_NAME_CATCONFIG, STORE_NAME_CATCONFIG } from 'static/js/idbUtil'
     import { createNamespacedHelpers } from 'vuex'
-    import { copyList } from 'assets/js/util'
+    import { copyList } from 'static/js/util'
     const { mapMutations, mapGetters } = createNamespacedHelpers('newProj')
 
 

@@ -9,18 +9,39 @@ const bgSyncPluginForCreate = new workbox.backgroundSync.Plugin('projects-create
                 if (savedProjId.indexOf(markId) ===-1){
                     console.log('fetch the first time');
                     savedProjId.push(markId);
-                    await fetch(entry.request);
+                    await fetch(entry.request).then(res=> {
+                        console.log('fetch successfully');
+                        if (Notification.permission === "granted") {
+                            self.registration.showNotification('The project was created successfully!', {
+                                body: '🎉`🎉`🎉`'
+                            n});
+                        }
+
+                    });
                 }
             } catch (error) {
                 console.error('Replay failed for request', entry.request, error);
-                await this.unshiftRequest(entry);
+                await queue.unshiftRequest(entry);
                 return;
             }
         }
     }
 });
 
-const bgSyncPluginForUpdate = new workbox.backgroundSync.Plugin('projects-update-queue');
+const bgSyncPluginForUpdate = new workbox.backgroundSync.Plugin('projects-update-queue', {
+    onSync: async ({queue}) => {
+        let entry;
+        while (entry = await queue.shiftRequest()) {
+            await fetch(entry.request).then(res=> {
+                if (Notification.permission === "granted") {
+                    self.registration.showNotification('The project was updated successfully!', {
+                        body: '🎉`🎉`🎉`'
+                    });
+                }
+            });
+        }
+    }
+});
 
 
 // 'http://localhost:1337'

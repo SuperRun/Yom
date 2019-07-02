@@ -16,10 +16,6 @@ async function createIndexedDB(dbName, storeName, version=1) {
         return await openDB(dbName, version, {
             upgrade(db) {
 
-                console.log(`version=${version}`);
-
-                console.log(`storeName=${storeName}`);
-
                 if (!db.objectStoreNames.contains(storeName)) {
 
                     const store = db.createObjectStore(storeName, {
@@ -29,17 +25,13 @@ async function createIndexedDB(dbName, storeName, version=1) {
                     });
 
                     if (storeName == 'projects') {
-                        console.log('create a index');
                         store.createIndex('createdAtIndex', 'created_at', {unique: false});
                         store.createIndex('projNameIndex', 'projName', {unique: false});
                     }
                 }
-
-
             }
         });
     }
-
 }
 
 async function saveDataLocally(db, storeName, datas) {
@@ -150,7 +142,6 @@ async function updateProj(db, id, val){
     await tx.done;
 
 }
-
 
 async function getProjsByDate(db){
    return await db.getAllFromIndex('projects', 'createdAtIndex');

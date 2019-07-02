@@ -7,7 +7,7 @@
 <script>
 
     import TypeItem from '@/components/chooseType/type-item'
-    import { createIndexedDB, saveDataLocally, getLocalData, DB_NAME_TYPE, STORE_NAME_TYPE} from 'assets/js/idbUtil'
+    import { createIndexedDB, saveDataLocally, getLocalData, DB_NAME_TYPE, STORE_NAME_TYPE} from 'static/js/idbUtil'
     import { createNamespacedHelpers } from 'vuex'
     const {  mapMutations } = createNamespacedHelpers('newProj')
 

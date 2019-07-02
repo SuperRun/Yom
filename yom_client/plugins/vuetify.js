@@ -16,6 +16,5 @@ Vue.use(Vuetify, {
     timelineColor1: '#d09796',
     timelineColor2: '#91dccb',
     timelineColor3: '#d9b780',
-
   }
 })
