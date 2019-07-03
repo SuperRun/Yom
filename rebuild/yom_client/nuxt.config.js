@@ -79,7 +79,7 @@ export default {
   },
   oneSignal: {
     init: {
-        appId: '02440743-6079-4840-b62b-d4213d2989c0',
+        appId: '15930ebe-f57c-417c-852b-d63b370d636e',
         allowLocalhostAsSecureOrigin: true,
         welcomeNotification: {
             disable: true
