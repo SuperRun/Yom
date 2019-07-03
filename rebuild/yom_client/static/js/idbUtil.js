@@ -90,6 +90,7 @@ async function getLocalDataByKeyPath(db, storeName, val) {
 }
 
 async function updateProj(db, id, val){
+    console.log('val',val);
     const tx = db.transaction('projects','readwrite');
     const store= tx.store;
     let cursor = await store.openCursor();

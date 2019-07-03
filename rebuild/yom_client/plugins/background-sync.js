@@ -16,7 +16,6 @@ const bgSyncPluginForCreate = new workbox.backgroundSync.Plugin('projects-create
                                 body: '🎉`🎉`🎉`'
                             });
                         }
-
                     });
                 }
             } catch (error) {
@@ -33,7 +32,7 @@ const bgSyncPluginForUpdate = new workbox.backgroundSync.Plugin('projects-update
         let entry;
         while (entry = await queue.shiftRequest()) {
             await fetch(entry.request).then(res=> {
-                if (Notification.permission === "granted") {
+                if (Notification.permission === "granted" && entry.request.url.indexOf('projects')!=-1) {
                     self.registration.showNotification('The project was updated successfully!', {
                         body: '🎉`🎉`🎉`'
                     });

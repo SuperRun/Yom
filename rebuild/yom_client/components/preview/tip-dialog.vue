@@ -114,6 +114,7 @@
                                 const dbPromise = await createIndexedDB(DB_NAME_PROJ, STORE_NAME_PROJ, 1);
                                 await updateProj(dbPromise, id, vm.editProj);
                                 dbPromise.close();
+                                await vm.updateProjHistoryCats();
                             }).finally(()=>{
                                 setTimeout(() => {
                                     vm.$emit('show-savingdialog', false);
